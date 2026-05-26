@@ -1,9 +1,9 @@
 package com.distribuidora.sanmartin.repository;
 
-import com.distribuidora.sanmartin.models.Producto;
+import com.distribuidora.sanmartin.models.Venta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductoRepository extends JpaRepository<Producto, Long> {
+public interface VentaRepository extends JpaRepository<Venta, Long> {
 }
