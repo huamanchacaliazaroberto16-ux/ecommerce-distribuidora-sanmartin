@@ -10,12 +10,14 @@ public class Categoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_categoria")
-    private Long idCategoria;
+    @Column(name = "id_categoria") // Mapea tu clave primaria de pgAdmin
+    private Integer idCategoria;
 
-    @Column(name = "nombre_categoria", nullable = false, length = 100)
-    private String nombreCategoria;
+    // Cambiado a "nombre_categoria" para coincidir con el estándar de tus tablas. 
+    // Si en tu pgAdmin se llama diferente, cambia solo lo que está entre comillas.
+    @Column(name = "nombre_categoria", nullable = false, length = 100) 
+    private String nombre;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 }

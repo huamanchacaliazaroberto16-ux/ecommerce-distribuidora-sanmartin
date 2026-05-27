@@ -21,7 +21,7 @@ public class ProductoService {
     }
 
     // Lógica del requerimiento de control de inventario
-    public void evaluarAlertaInventario(Long id) {
+    public void evaluarAlertaInventario(Integer id) {
         Producto producto = productoRepository.findById(id).orElse(null);
         if (producto != null && producto.requiereAlerta()) {
             System.out.println("ALERT SUNAT/STOCK: El producto '" + producto.getNombreProducto() + 

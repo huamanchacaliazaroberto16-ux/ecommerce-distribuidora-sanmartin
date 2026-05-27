@@ -12,7 +12,7 @@ public class Envio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_envio")
-    private Long idEnvio;
+    private Integer idEnvio; // <-- El único cambio: de Long a Integer
 
     @Column(name = "id_venta")
     private Integer idVenta;

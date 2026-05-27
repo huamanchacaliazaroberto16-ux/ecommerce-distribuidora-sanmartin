@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DetalleVentaRepository extends JpaRepository<DetalleVenta, DetalleVentaId> {
-    // Usa DetalleVentaId porque maneja llave primaria compuesta
 }

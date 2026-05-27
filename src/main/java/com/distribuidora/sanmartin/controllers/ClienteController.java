@@ -3,6 +3,7 @@ package com.distribuidora.sanmartin.controllers;
 import com.distribuidora.sanmartin.models.Cliente;
 import com.distribuidora.sanmartin.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,27 +15,47 @@ public class ClienteController {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    // 1. LISTAR TODOS LOS CLIENTES
+    // Obtener todos los clientes
     @GetMapping
     public List<Cliente> listarTodos() {
         return clienteRepository.findAll();
     }
 
-    // 2. BUSCAR UN CLIENTE POR ID
+    // Obtener un cliente por ID
     @GetMapping("/{id}")
-    public Cliente obtenerPorId(@PathVariable Long id) {
-        return clienteRepository.findById(id).orElse(null);
+    public ResponseEntity<Cliente> obtenerPorId(@PathVariable Integer id) {
+        return clienteRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // 3. REGISTRAR O ACTUALIZAR UN CLIENTE (Soporta los datos de tu script)
+    // Crear un nuevo cliente
     @PostMapping
-    public Cliente guardar(@RequestBody Cliente cliente) {
+    public Cliente crearCliente(@RequestBody Cliente cliente) {
         return clienteRepository.save(cliente);
     }
 
-    // 4. ELIMINAR UN CLIENTE
+    // Actualizar un cliente existente
+    @PutMapping("/{id}")
+    public ResponseEntity<Cliente> actualizarCliente(@PathVariable Integer id, @RequestBody Cliente detallesCliente) {
+        if (!clienteRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // Mapeado usando CamelCase según tu modelo Cliente.java
+        detallesCliente.setIdCliente(id); 
+        
+        Cliente clienteActualizado = clienteRepository.save(detallesCliente);
+        return ResponseEntity.ok(clienteActualizado);
+    }
+
+    // Eliminar un cliente
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarCliente(@PathVariable Integer id) {
+        if (!clienteRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
         clienteRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

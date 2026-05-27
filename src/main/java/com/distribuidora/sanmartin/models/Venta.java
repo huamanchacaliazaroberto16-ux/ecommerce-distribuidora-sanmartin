@@ -13,7 +13,7 @@ public class Venta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_venta")
-    private Long idVenta;
+    private Integer idVenta;
 
     @Column(name = "fecha_venta")
     private LocalDateTime fechaVenta = LocalDateTime.now();
