@@ -5,20 +5,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@Controller // Usamos @Controller tradicional para renderizar HTML con Thymeleaf
+@Controller
 public class ViewController {
 
     @Autowired
     private ProductoService productoService;
 
-    // Cuando el usuario entre a http://localhost:8080/productos, se cargará el HTML
+    // Ruta de prueba rápida
+    @GetMapping("/test")
+    @ResponseBody
+    public String test() {
+        return "El controlador está funcionando perfectamente!";
+    }
+
+    // Ruta raíz
+    @GetMapping({"/", "/index"})
+    public String index() {
+        return "index";
+    }
+
+    // Ruta productos con servicio activo
     @GetMapping("/productos")
     public String verPaginaProductos(Model model) {
-        // Jalamos los productos reales de tu base de datos de pgAdmin
         model.addAttribute("listaProductos", productoService.listarProductos());
-        
-        // Retorna el nombre exacto del archivo HTML sin la extensión
-        return "productos"; 
+        return "productos";
+    }
+
+    // Ruta envíos
+    @GetMapping("/envios")
+    public String envios() {
+        return "envios";
     }
 }

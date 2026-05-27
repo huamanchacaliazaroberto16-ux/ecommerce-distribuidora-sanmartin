@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribuidora San Martín - Sistema de Gestión</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f6fa;
+            color: #333;
+        }
+
+        /* Barra de navegación superior con el rojo de la marca */
+        header {
+            background-color: #b30000;
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        /* Contenedor Principal */
+        main {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+            border-left: 5px solid #d63031;
+        }
+
+        .welcome-section h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        /* Grid de Accesos Directos */
+        .modules-grid {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 20px;
+        }
+
+        .module-row {
+            display: table-row;
+        }
+
+        .module-card {
+            display: table-cell;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            vertical-align: top;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .module-card h3 {
+            color: #b30000;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .module-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        /* Botones con estilo rojo elegante */
+        .btn-access {
+            display: inline-block;
+            background-color: #d63031;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-access:hover {
+            background-color: #b30000;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            color: #888;
+            font-size: 13px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Distribuidora San Martín — Panel de Control</h1>
+    </header>
+
+    <main>
+        <section class="welcome-section">
+            <h2>¡Bienvenido al Sistema de Gestión de E-commerce!</h2>
+            <p>Selecciona uno de los módulos internos del negocio para comenzar a operar el sistema.</p>
+        </section>
+
+        <div class="modules-grid">
+            <div class="module-row">
+                
+                <div class="module-card">
+                    <h3>📦 Inventario</h3>
+                    <p>Gestión completa del catálogo de productos, control de stock y asignación de categorías para la distribuidora.</p>
+                    <a th:href="@{/productos}" class="btn-access">Ir a Productos</a>
+                </div>
+
+                <div class="module-card">
+                    <h3>🚚 Despachos</h3>
+                    <p>Control de rutas de entrega, asignación de transportistas y actualización en tiempo real de los estados de envío.</p>
+                    <a th:href="@{/envios}" class="btn-access">Gestionar Envíos</a>
+                </div>
+
+                <div class="module-card">
+                    <h3>👥 Clientes</h3>
+                    <p>Administración del directorio de clientes registrados, historial de compras y preferencias de facturación.</p>
+                    <a href="#" class="btn-access" style="background-color: #7f8c8d; cursor: not-allowed;">Próximamente</a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Distribuidora San Martín. Sistema de Gestión Integrador — UTP.</p>
+    </footer>
+
+</body>
+</html>
