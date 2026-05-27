@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribuidora San Martín - Inventario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="bi bi-shop me-2"></i>Distribuidora San Martín</a>
+            <div class="navbar-nav">
+                <a class="nav-link active" href="#">Inventario</a>
+                <a class="nav-link" href="#">Clientes</a>
+                <a class="nav-link" href="#">Ventas</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col">
+                <h2><i class="bi bi-box-seam me-2"></i>Control de Inventario de Productos</h2>
+                <p class="text-muted">Módulo de control de stock actual y alertas críticas.</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Producto</th>
+                                <th>Precio Unitario</th>
+                                <th>Stock Actual</th>
+                                <th>Stock Mínimo</th>
+                                <th>Estado / Alerta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="prod : ${listaProductos}">
+                                <td th:text="${prod.idProducto}">1</td>
+                                <td th:text="${prod.nombreProducto}" class="fw-bold">Producto de prueba</td>
+                                <td th:text="'S/. ' + ${prod.precioUnitario}">S/. 0.00</td>
+                                <td th:text="${prod.stockActual}">0</td>
+                                <td th:text="${prod.stockMinimo}">5</td>
+                                <td>
+                                    <span th:if="${prod.requiereAlerta()}" class="badge bg-danger p-2 animate__animated animate__flash">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i> STOCK CRÍTICO
+                                    </span>
+                                    <span th:unless="${prod.requiereAlerta()}" class="badge bg-success p-2">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Stock Estable
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
