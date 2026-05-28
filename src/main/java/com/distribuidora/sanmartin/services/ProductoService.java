@@ -8,7 +8,7 @@ import java.util.List;
 
 @Service
 public class ProductoService {
-
+    
     @Autowired
     private ProductoRepository productoRepository;
 
@@ -16,17 +16,16 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
-    public Producto registrarOActualizar(Producto producto) {
-        return productoRepository.save(producto);
+    public void guardar(Producto producto) {
+        productoRepository.save(producto);
+    }
+    
+    // NUEVO: Métodos para eliminar y editar
+    public void eliminar(Integer id) {
+        productoRepository.deleteById(id);
     }
 
-    // Lógica del requerimiento de control de inventario
-    public void evaluarAlertaInventario(Integer id) {
-        Producto producto = productoRepository.findById(id).orElse(null);
-        if (producto != null && producto.requiereAlerta()) {
-            System.out.println("ALERT SUNAT/STOCK: El producto '" + producto.getNombreProducto() + 
-                               "' alcanzó el stock mínimo de " + producto.getStockMinimo() + 
-                               ". Stock actual: " + producto.getStockActual());
-        }
+    public Producto obtenerPorId(Integer id) {
+        return productoRepository.findById(id).orElse(null);
     }
 }

@@ -27,16 +27,19 @@ public class Producto {
     private Integer stockActual;
 
     @Column(name = "stock_minimo")
-    private Integer stockMinimo = 5; // Tu DEFAULT 5 del SQL
+    private Integer stockMinimo = 5;
 
     @Column(name = "id_categoria")
     private Integer idCategoria;
 
     @Column(name = "id_proveedor")
     private Integer idProveedor;
+    
+    // Nuevo campo para la imagen
+    @Column(name = "url_imagen")
+    private String urlImagen;
 
-    // Lógica para tu requerimiento de Alerta de Stock Mínimo
     public boolean requiereAlerta() {
-        return this.stockActual <= this.stockMinimo;
+        return this.stockActual != null && this.stockMinimo != null && this.stockActual <= this.stockMinimo;
     }
 }
