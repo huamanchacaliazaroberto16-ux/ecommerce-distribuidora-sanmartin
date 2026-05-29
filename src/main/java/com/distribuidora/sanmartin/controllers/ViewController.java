@@ -5,7 +5,7 @@ import com.distribuidora.sanmartin.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*; // Esto importa Get, Post, PathVariable, etc.
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class ViewController {
@@ -13,8 +13,39 @@ public class ViewController {
     @Autowired
     private ProductoService productoService;
 
-    @GetMapping({"/", "/index"})
-    public String index() { return "index"; }
+    // ==========================================
+    // 1. MUNDO PÚBLICO (Puerta de entrada)
+    // ==========================================
+    
+    @GetMapping("/")
+    public String inicio() {
+        return "inicio"; // Carga el nuevo archivo inicio.html que crearemos
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login"; // Carga tu pantalla de inicio de sesión
+    }
+
+    @GetMapping("/registro")
+    public String registro() {
+        return "registro"; // Carga tu pantalla de registro
+    }
+
+    @GetMapping("/tienda")
+    public String mostrarCatalogo(Model model) {
+        model.addAttribute("listaProductos", productoService.listarProductos());
+        return "catalogo"; // Tu diseño profesional de tarjetas
+    }
+
+    // ==========================================
+    // 2. MUNDO ADMINISTRATIVO (Inventario)
+    // ==========================================
+
+    @GetMapping("/admin")
+    public String admin() {
+        return "index"; // Tu panel de control original (Dashboard)
+    }
 
     @GetMapping("/productos")
     public String listar(Model model) {
