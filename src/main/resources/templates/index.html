@@ -120,9 +120,14 @@
 </head>
 <body>
 
-    <header>
-        <h1>Distribuidora San Martín — Panel de Control</h1>
-    </header>
+    <header style="display: flex; justify-content: space-between; align-items: center;">
+    <h1>Distribuidora San Martín — Panel de Control</h1>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" style="background-color: white; color: #b30000; border: 2px solid white; padding: 8px 18px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+            Cerrar Sesión
+        </button>
+    </form>
+</header>
 
     <main>
         <section class="welcome-section">
