@@ -14,9 +14,10 @@
 </head>
 <body>
     <nav class="navbar navbar-light bg-white shadow-sm mb-5">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-danger" href="#">SAN MARTÍN</a>
-        </div>
+    <div class="container">
+        <a class="navbar-brand fw-bold text-danger" href="#">SAN MARTÍN</a>
+        <a href="/login" class="btn btn-danger px-4">Iniciar Sesión</a>
+    </div>
     </nav>
     <div class="container">
         <h3 class="mb-4">Nuestros Productos</h3>
@@ -27,11 +28,20 @@
                     <div class="card-body">
                         <h5 class="card-title" th:text="${p.nombreProducto}">Nombre</h5>
                         <p class="text-danger fw-bold" th:text="'S/. ' + ${p.precioUnitario}">Precio</p>
-                        <button class="btn btn-comprar w-100">Agregar al Carrito</button>
+                        <button class="btn btn-comprar w-100" onclick="document.getElementById('modalLogin').style.display='flex'">Agregar al Carrito</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Modal aviso login -->
+<div id="modalLogin" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:white; padding:40px; border-radius:15px; text-align:center; max-width:380px; width:90%;">
+        <h5 class="mb-3">Inicia sesión para continuar</h5>
+        <p class="text-muted mb-4">Para agregar productos al carrito debes iniciar sesión primero.</p>
+        <a href="/login" class="btn btn-danger px-4 me-2">Iniciar Sesión</a>
+        <button onclick="document.getElementById('modalLogin').style.display='none'" class="btn btn-outline-secondary px-4">Cancelar</button>
+    </div>
+</div>
 </body>
 </html>

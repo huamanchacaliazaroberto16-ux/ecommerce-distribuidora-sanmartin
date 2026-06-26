@@ -4,6 +4,8 @@ import com.distribuidora.sanmartin.models.Producto;
 import com.distribuidora.sanmartin.models.Usuario; // Nuevo import
 import com.distribuidora.sanmartin.services.ProductoService;
 import com.distribuidora.sanmartin.repository.UsuarioRepository; // Asegúrate de que esta sea la ruta correcta a tu carpeta repository
+import com.distribuidora.sanmartin.models.Envio;
+import com.distribuidora.sanmartin.services.EnvioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -62,6 +64,26 @@ public class ViewController {
     public String admin() {
         return "index";
     }
+    @Autowired
+private EnvioService envioService;
+
+@GetMapping("/envios")
+public String envios(Model model) {
+    model.addAttribute("listaEnvios", envioService.listarEnvios());
+    return "envios";
+}
+
+@PostMapping("/envios/guardar")
+public String guardarEnvio(Envio envio) {
+    envioService.guardarOActualizar(envio);
+    return "redirect:/envios";
+}
+
+@PostMapping("/envios/estado")
+public String cambiarEstado(@RequestParam Integer id, @RequestParam String estado) {
+    envioService.actualizarEstado(id, estado);
+    return "redirect:/envios";
+}
 
     @GetMapping("/productos")
     public String listar(Model model) {
