@@ -96,13 +96,19 @@
             <form th:action="@{/envios/guardar}" method="post">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">ID Venta</label>
-                        <input type="number" name="idVenta" class="form-control" required>
-                    </div>
+    <label class="form-label">ID Venta <span class="text-muted">(opcional)</span></label>
+    <input type="number" name="idVenta" class="form-control" placeholder="Dejar vacío si aún no hay venta">
+</div>
                     <div class="mb-3">
-                        <label class="form-label">ID Repartidor</label>
-                        <input type="number" name="idRepartidor" class="form-control" required>
-                    </div>
+    <label class="form-label">Repartidor</label>
+    <select name="idRepartidor" class="form-select" required>
+        <option value="">-- Selecciona un repartidor --</option>
+        <option th:each="r : ${listaRepartidores}"
+                th:value="${r.idRepartidor}"
+                th:text="${r.nombreCompleto} + ' - ' + ${r.vehiculo}">
+        </option>
+    </select>
+</div>
                     <div class="mb-3">
                         <label class="form-label">Dirección de Entrega</label>
                         <input type="text" name="direccionEntrega" class="form-control" required>

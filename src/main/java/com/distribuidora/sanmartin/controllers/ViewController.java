@@ -1,9 +1,10 @@
 package com.distribuidora.sanmartin.controllers;
 
 import com.distribuidora.sanmartin.models.Producto;
-import com.distribuidora.sanmartin.models.Usuario; // Nuevo import
+import com.distribuidora.sanmartin.models.Usuario; 
+import com.distribuidora.sanmartin.repository.RepartidorRepository;
 import com.distribuidora.sanmartin.services.ProductoService;
-import com.distribuidora.sanmartin.repository.UsuarioRepository; // Asegúrate de que esta sea la ruta correcta a tu carpeta repository
+import com.distribuidora.sanmartin.repository.UsuarioRepository; 
 import com.distribuidora.sanmartin.models.Envio;
 import com.distribuidora.sanmartin.services.EnvioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,14 @@ public class ViewController {
     @Autowired
     private ProductoService productoService;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository; // Inyección del repositorio para registrar
+   @Autowired
+private UsuarioRepository usuarioRepository;
+
+@Autowired
+private EnvioService envioService;
+
+@Autowired
+private RepartidorRepository repartidorRepository; // Inyección del repositorio para registrar
 
     // ==========================================
     // 1. MUNDO PÚBLICO
@@ -64,12 +71,12 @@ public class ViewController {
     public String admin() {
         return "index";
     }
-    @Autowired
-private EnvioService envioService;
+   
 
 @GetMapping("/envios")
 public String envios(Model model) {
     model.addAttribute("listaEnvios", envioService.listarEnvios());
+    model.addAttribute("listaRepartidores", repartidorRepository.findAll());
     return "envios";
 }
 
