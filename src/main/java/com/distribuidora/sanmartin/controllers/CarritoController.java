@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.distribuidora.sanmartin.services.VentaService;
+import com.distribuidora.sanmartin.repository.UsuarioRepository;
+import com.distribuidora.sanmartin.models.Usuario;
+import org.springframework.security.core.Authentication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +22,11 @@ public class CarritoController {
 
     @Autowired
     private ProductoService productoService;
+    @Autowired
+private VentaService ventaService;
+
+@Autowired
+private UsuarioRepository usuarioRepository;
 
     // Ver carrito
     @GetMapping
@@ -74,10 +83,17 @@ public class CarritoController {
 
     // Confirmar pedido
     @PostMapping("/confirmar")
-    public String confirmar(HttpSession session) {
+public String confirmar(HttpSession session, Authentication authentication) {
+    List<ItemCarrito> carrito = obtenerCarrito(session);
+    if (!carrito.isEmpty()) {
+        // Obtener usuario logueado
+        String username = authentication.getName();
+        Usuario usuario = usuarioRepository.findByUsername(username);
+        ventaService.crearVenta(carrito, usuario.getId_usuario());
         session.removeAttribute("carrito");
-        return "redirect:/tienda?pedido=ok";
     }
+    return "redirect:/tienda?pedido=ok";
+}
 
     // Método auxiliar
     @SuppressWarnings("unchecked")

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedidos | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f5f6fa; }
+        header { background-color: #b30000; color: white; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>📋 Gestión de Pedidos</h1>
+    <a href="/admin" class="btn btn-outline-light btn-sm">← Volver al Panel</a>
+</header>
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#Venta</th>
+                        <th>Fecha</th>
+                        <th>ID Cliente</th>
+                        <th>Subtotal</th>
+                        <th>IGV</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(listaPedidos)}">
+                        <td colspan="7" class="text-center text-muted py-4">No hay pedidos aún.</td>
+                    </tr>
+                    <tr th:each="v : ${listaPedidos}">
+                        <td th:text="${v.idVenta}"></td>
+                        <td th:text="${v.fechaVenta}"></td>
+                        <td th:text="${v.idCliente}"></td>
+                        <td th:text="'S/. ' + ${v.subtotal}"></td>
+                        <td th:text="'S/. ' + ${v.igv}"></td>
+                        <td th:text="'S/. ' + ${v.totalPagar}"></td>
+                        <td>
+                            <span class="badge"
+                                th:classappend="${v.estadoPago == 'Pendiente'} ? 'bg-warning text-dark' :
+                                               (${v.estadoPago == 'Pagado'} ? 'bg-success' : 'bg-secondary')"
+                                th:text="${v.estadoPago}">
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
