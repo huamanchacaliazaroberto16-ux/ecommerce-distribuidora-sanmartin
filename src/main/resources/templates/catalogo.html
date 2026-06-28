@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Tienda | Distribuidora San Martín</title>
@@ -14,34 +15,62 @@
 </head>
 <body>
     <nav class="navbar navbar-light bg-white shadow-sm mb-5">
-    <div class="container">
-        <a class="navbar-brand fw-bold text-danger" href="#">SAN MARTÍN</a>
-        <a href="/login" class="btn btn-danger px-4">Iniciar Sesión</a>
-    </div>
+        <div class="container">
+            <a class="navbar-brand fw-bold text-danger" href="#">SAN MARTÍN</a>
+            <div class="d-flex gap-2 align-items-center">
+                <!-- Si hay sesión activa -->
+                <div sec:authorize="isAuthenticated()">
+                    <a href="/carrito" class="btn btn-outline-danger px-3 me-2">🛒 Mi Carrito</a>
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger px-3">Cerrar Sesión</button>
+                    </form>
+                </div>
+                <!-- Si es invitado -->
+                <div sec:authorize="!isAuthenticated()">
+                    <a href="/login" class="btn btn-danger px-4">Iniciar Sesión</a>
+                </div>
+            </div>
+        </div>
     </nav>
+
     <div class="container">
         <h3 class="mb-4">Nuestros Productos</h3>
         <div class="row row-cols-1 row-cols-md-4 g-4">
             <div class="col" th:each="p : ${listaProductos}">
                 <div class="card product-card h-100">
-                    <img th:src="${p.urlImagen}" class="card-img-top" onerror="this.src='https://via.placeholder.com/200'">
+                    <img th:src="${p.urlImagen}" class="card-img-top"
+                         onerror="this.src='https://via.placeholder.com/200'">
                     <div class="card-body">
                         <h5 class="card-title" th:text="${p.nombreProducto}">Nombre</h5>
                         <p class="text-danger fw-bold" th:text="'S/. ' + ${p.precioUnitario}">Precio</p>
-                        <button class="btn btn-comprar w-100" onclick="document.getElementById('modalLogin').style.display='flex'">Agregar al Carrito</button>
+
+                        <!-- Usuario logueado: agrega al carrito -->
+                        <a th:href="@{/carrito/agregar/{id}(id=${p.idProducto})}"
+                           sec:authorize="isAuthenticated()"
+                           class="btn btn-comprar w-100">Agregar al Carrito</a>
+
+                        <!-- Invitado: muestra modal -->
+                        <button class="btn btn-comprar w-100"
+                                sec:authorize="!isAuthenticated()"
+                                onclick="document.getElementById('modalLogin').style.display='flex'">
+                            Agregar al Carrito
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Modal aviso login -->
-<div id="modalLogin" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
-    <div style="background:white; padding:40px; border-radius:15px; text-align:center; max-width:380px; width:90%;">
-        <h5 class="mb-3">Inicia sesión para continuar</h5>
-        <p class="text-muted mb-4">Para agregar productos al carrito debes iniciar sesión primero.</p>
-        <a href="/login" class="btn btn-danger px-4 me-2">Iniciar Sesión</a>
-        <button onclick="document.getElementById('modalLogin').style.display='none'" class="btn btn-outline-secondary px-4">Cancelar</button>
+    <div id="modalLogin" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; padding:40px; border-radius:15px; text-align:center; max-width:380px; width:90%;">
+            <h5 class="mb-3">Inicia sesión para continuar</h5>
+            <p class="text-muted mb-4">Para agregar productos al carrito debes iniciar sesión primero.</p>
+            <a href="/login" class="btn btn-danger px-4 me-2">Iniciar Sesión</a>
+            <button onclick="document.getElementById('modalLogin').style.display='none'" class="btn btn-outline-secondary px-4">Cancelar</button>
+        </div>
     </div>
-</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
