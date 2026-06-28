@@ -2,16 +2,16 @@ package com.distribuidora.sanmartin.controllers;
 
 import com.distribuidora.sanmartin.models.ItemCarrito;
 import com.distribuidora.sanmartin.models.Producto;
+import com.distribuidora.sanmartin.models.Usuario;
+import com.distribuidora.sanmartin.repository.UsuarioRepository;
 import com.distribuidora.sanmartin.services.ProductoService;
+import com.distribuidora.sanmartin.services.VentaService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import com.distribuidora.sanmartin.services.VentaService;
-import com.distribuidora.sanmartin.repository.UsuarioRepository;
-import com.distribuidora.sanmartin.models.Usuario;
-import org.springframework.security.core.Authentication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +22,12 @@ public class CarritoController {
 
     @Autowired
     private ProductoService productoService;
-    @Autowired
-private VentaService ventaService;
 
-@Autowired
-private UsuarioRepository usuarioRepository;
+    @Autowired
+    private VentaService ventaService;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     // Ver carrito
     @GetMapping
@@ -44,7 +45,6 @@ private UsuarioRepository usuarioRepository;
         Producto producto = productoService.obtenerPorId(id);
         List<ItemCarrito> carrito = obtenerCarrito(session);
 
-        // Si ya existe el producto, incrementa cantidad
         boolean encontrado = false;
         for (ItemCarrito item : carrito) {
             if (item.getIdProducto().equals(id)) {
@@ -83,17 +83,19 @@ private UsuarioRepository usuarioRepository;
 
     // Confirmar pedido
     @PostMapping("/confirmar")
-public String confirmar(HttpSession session, Authentication authentication) {
-    List<ItemCarrito> carrito = obtenerCarrito(session);
-    if (!carrito.isEmpty()) {
-        // Obtener usuario logueado
-        String username = authentication.getName();
-        Usuario usuario = usuarioRepository.findByUsername(username);
-        ventaService.crearVenta(carrito, usuario.getId_usuario());
-        session.removeAttribute("carrito");
+    public String confirmar(HttpSession session,
+                            Authentication authentication,
+                            @RequestParam String tipoEntrega,
+                            @RequestParam(required = false) String direccionEntrega) {
+        List<ItemCarrito> carrito = obtenerCarrito(session);
+        if (!carrito.isEmpty()) {
+            String username = authentication.getName();
+            Usuario usuario = usuarioRepository.findByUsername(username);
+            ventaService.crearVenta(carrito, usuario.getId_usuario(), tipoEntrega, direccionEntrega);
+            session.removeAttribute("carrito");
+        }
+        return "redirect:/tienda?pedido=ok";
     }
-    return "redirect:/tienda?pedido=ok";
-}
 
     // Método auxiliar
     @SuppressWarnings("unchecked")

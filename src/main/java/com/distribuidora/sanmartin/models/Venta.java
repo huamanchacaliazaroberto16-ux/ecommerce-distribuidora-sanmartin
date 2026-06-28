@@ -35,4 +35,10 @@ public class Venta {
 
     @Column(name = "id_cliente")
     private Integer idCliente;
+
+    @Column(name = "tipo_entrega", length = 20)
+    private String tipoEntrega = "Tienda";
+
+    @Column(name = "direccion_entrega", columnDefinition = "TEXT")
+    private String direccionEntrega;
 }

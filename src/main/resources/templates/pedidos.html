@@ -27,12 +27,15 @@
                         <th>Subtotal</th>
                         <th>IGV</th>
                         <th>Total</th>
-                        <th>Estado</th>
+                        <th>Tipo Entrega</th>
+                        <th>Dirección</th>
+                        <th>Estado Pago</th>
+                        <th>Cambiar Estado</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:if="${#lists.isEmpty(listaPedidos)}">
-                        <td colspan="7" class="text-center text-muted py-4">No hay pedidos aún.</td>
+                        <td colspan="10" class="text-center text-muted py-4">No hay pedidos aún.</td>
                     </tr>
                     <tr th:each="v : ${listaPedidos}">
                         <td th:text="${v.idVenta}"></td>
@@ -42,11 +45,28 @@
                         <td th:text="'S/. ' + ${v.igv}"></td>
                         <td th:text="'S/. ' + ${v.totalPagar}"></td>
                         <td>
+                            <span th:text="${v.tipoEntrega}"
+                                  th:classappend="${v.tipoEntrega == 'Domicilio'} ? 'badge bg-primary' : 'badge bg-secondary'">
+                            </span>
+                        </td>
+                        <td th:text="${v.direccionEntrega != null ? v.direccionEntrega : '-'}"></td>
+                        <td>
                             <span class="badge"
                                 th:classappend="${v.estadoPago == 'Pendiente'} ? 'bg-warning text-dark' :
                                                (${v.estadoPago == 'Pagado'} ? 'bg-success' : 'bg-secondary')"
                                 th:text="${v.estadoPago}">
                             </span>
+                        </td>
+                        <td>
+                            <form th:action="@{/pedidos/estado}" method="post" class="d-flex gap-1">
+                                <input type="hidden" name="id" th:value="${v.idVenta}">
+                                <select name="estado" class="form-select form-select-sm">
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Pagado">Pagado</option>
+                                    <option value="Cancelado">Cancelado</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-danger">OK</button>
+                            </form>
                         </td>
                     </tr>
                 </tbody>
@@ -54,5 +74,6 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

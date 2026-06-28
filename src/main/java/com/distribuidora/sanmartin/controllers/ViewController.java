@@ -57,14 +57,12 @@ public class ViewController {
 
     @PostMapping("/registro")
     public String procesarRegistro(@RequestParam String username, @RequestParam String password) {
-        // 1. Guardar usuario
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setUsername(username);
         nuevoUsuario.setPassword_hash(password);
         nuevoUsuario.setId_rol(2);
         Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
 
-        // 2. Crear cliente vinculado automáticamente
         Cliente nuevoCliente = new Cliente();
         nuevoCliente.setNombreCompleto(username);
         nuevoCliente.setIdUsuario(usuarioGuardado.getId_usuario());
@@ -90,8 +88,11 @@ public class ViewController {
 
     @GetMapping("/envios")
     public String envios(Model model) {
+        // Solo mostrar pedidos con tipo Domicilio que aún no tienen envío
         model.addAttribute("listaEnvios", envioService.listarEnvios());
         model.addAttribute("listaRepartidores", repartidorRepository.findAll());
+        model.addAttribute("listaPedidosDomicilio",
+            ventaService.listarPorTipoEntrega("Domicilio"));
         return "envios";
     }
 
@@ -141,6 +142,13 @@ public class ViewController {
     public String pedidos(Model model) {
         model.addAttribute("listaPedidos", ventaService.listarTodas());
         return "pedidos";
+    }
+
+    @PostMapping("/pedidos/estado")
+    public String cambiarEstadoPedido(@RequestParam Integer id,
+                                      @RequestParam String estado) {
+        ventaService.actualizarEstadoPago(id, estado);
+        return "redirect:/pedidos";
     }
 
     @GetMapping("/clientes")

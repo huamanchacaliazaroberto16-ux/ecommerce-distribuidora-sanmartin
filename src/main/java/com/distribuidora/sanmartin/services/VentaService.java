@@ -27,12 +27,11 @@ public class VentaService {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    public Venta crearVenta(List<ItemCarrito> carrito, Integer idUsuario) {
-        // Buscar cliente asociado al usuario
+    public Venta crearVenta(List<ItemCarrito> carrito, Integer idUsuario,
+                            String tipoEntrega, String direccionEntrega) {
         Cliente cliente = clienteRepository.findByIdUsuario(idUsuario);
         Integer idCliente = (cliente != null) ? cliente.getIdCliente() : null;
 
-        // Calcular montos
         BigDecimal subtotal = carrito.stream()
             .map(i -> BigDecimal.valueOf(i.getSubtotal()))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -41,7 +40,6 @@ public class VentaService {
             .setScale(2, RoundingMode.HALF_UP);
         BigDecimal total = subtotal.add(igv);
 
-        // Crear venta
         Venta venta = new Venta();
         venta.setFechaVenta(LocalDateTime.now());
         venta.setSubtotal(subtotal);
@@ -50,9 +48,10 @@ public class VentaService {
         venta.setTotalPagar(total);
         venta.setEstadoPago("Pendiente");
         venta.setIdCliente(idCliente);
+        venta.setTipoEntrega(tipoEntrega);
+        venta.setDireccionEntrega("Domicilio".equals(tipoEntrega) ? direccionEntrega : null);
         Venta ventaGuardada = ventaRepository.save(venta);
 
-        // Crear detalles
         for (ItemCarrito item : carrito) {
             DetalleVenta detalle = new DetalleVenta();
             detalle.setIdVenta(ventaGuardada.getIdVenta());
@@ -71,5 +70,16 @@ public class VentaService {
 
     public List<Venta> listarPorCliente(Integer idCliente) {
         return ventaRepository.findByIdCliente(idCliente);
+    }
+
+    public Venta actualizarEstadoPago(Integer idVenta, String nuevoEstado) {
+        return ventaRepository.findById(idVenta).map(venta -> {
+            venta.setEstadoPago(nuevoEstado);
+            return ventaRepository.save(venta);
+        }).orElse(null);
+    }
+
+    public List<Venta> listarPorTipoEntrega(String tipoEntrega) {
+        return ventaRepository.findByTipoEntrega(tipoEntrega);
     }
 }
