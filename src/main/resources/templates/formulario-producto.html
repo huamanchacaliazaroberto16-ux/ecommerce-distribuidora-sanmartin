@@ -10,14 +10,25 @@
         <div class="card shadow">
             <div class="card-body">
                 <h2 class="mb-4">Registrar / Editar Producto</h2>
-                
+
                 <form th:action="@{/productos/guardar}" th:object="${producto}" method="post">
-                    
+
                     <input type="hidden" th:field="*{idProducto}">
 
                     <div class="mb-3">
                         <label class="form-label">Nombre del Producto</label>
                         <input type="text" th:field="*{nombreProducto}" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Categoría</label>
+                        <select th:field="*{idCategoria}" class="form-select" required>
+                            <option value="">-- Selecciona una categoría --</option>
+                            <option th:each="cat : ${listaCategorias}"
+                                    th:value="${cat.idCategoria}"
+                                    th:text="${cat.nombre}">
+                            </option>
+                        </select>
                     </div>
 
                     <div class="row">

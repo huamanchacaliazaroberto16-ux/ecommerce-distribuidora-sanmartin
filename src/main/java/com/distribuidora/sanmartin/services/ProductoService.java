@@ -8,7 +8,7 @@ import java.util.List;
 
 @Service
 public class ProductoService {
-    
+
     @Autowired
     private ProductoRepository productoRepository;
 
@@ -19,13 +19,20 @@ public class ProductoService {
     public void guardar(Producto producto) {
         productoRepository.save(producto);
     }
-    
-    // NUEVO: Métodos para eliminar y editar
+
     public void eliminar(Integer id) {
         productoRepository.deleteById(id);
     }
 
     public Producto obtenerPorId(Integer id) {
         return productoRepository.findById(id).orElse(null);
+    }
+
+    public List<Producto> filtrarPorCategoria(Integer idCategoria) {
+        return productoRepository.findByIdCategoria(idCategoria);
+    }
+
+    public List<Producto> buscarPorNombre(String nombre) {
+        return productoRepository.findByNombreProductoContainingIgnoreCase(nombre);
     }
 }

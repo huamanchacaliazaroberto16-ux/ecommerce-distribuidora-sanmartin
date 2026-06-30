@@ -9,23 +9,25 @@
         body { background-color: #f8f9fa; }
         .product-card { transition: transform 0.2s; border: none; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .product-card:hover { transform: scale(1.03); }
-        .card-img-top { height: 200px; object-fit: cover; border-top-left-radius: 15px; border-top-right-radius: 15px; }
+        .card-img-top { height: 220px; object-fit: contain; background: #fff; padding: 15px; border-top-left-radius: 15px; border-top-right-radius: 15px; }
         .btn-comprar { background-color: #d32f2f; color: white; border-radius: 20px; }
+        .filtro-categoria { border-radius: 20px; padding: 6px 18px; margin-right: 8px; margin-bottom: 8px; display: inline-block; }
+        .filtro-categoria.activo { background-color: #d32f2f; color: white; }
+        .filtro-categoria:not(.activo) { background-color: white; color: #333; border: 1px solid #ddd; }
+        .filtro-categoria:hover { text-decoration: none; opacity: 0.85; }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-light bg-white shadow-sm mb-5">
+    <nav class="navbar navbar-light bg-white shadow-sm mb-4">
         <div class="container">
-            <a class="navbar-brand fw-bold text-danger" href="#">SAN MARTÍN</a>
+            <a class="navbar-brand fw-bold text-danger" href="/tienda">SAN MARTÍN</a>
             <div class="d-flex gap-2 align-items-center">
-                <!-- Si hay sesión activa -->
                 <div sec:authorize="isAuthenticated()">
                     <a href="/carrito" class="btn btn-outline-danger px-3 me-2">🛒 Mi Carrito</a>
                     <form th:action="@{/logout}" method="post" class="d-inline">
                         <button type="submit" class="btn btn-danger px-3">Cerrar Sesión</button>
                     </form>
                 </div>
-                <!-- Si es invitado -->
                 <div sec:authorize="!isAuthenticated()">
                     <a href="/login" class="btn btn-danger px-4">Iniciar Sesión</a>
                 </div>
@@ -34,7 +36,37 @@
     </nav>
 
     <div class="container">
+
+        <!-- Buscador -->
+        <form th:action="@{/tienda}" method="get" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="buscar" th:value="${buscarTexto}"
+                       class="form-control form-control-lg"
+                       placeholder="Buscar productos...">
+                <button class="btn btn-danger px-4" type="submit">🔍 Buscar</button>
+            </div>
+        </form>
+
+        <!-- Filtro de categorías -->
+        <div class="mb-4">
+            <a th:href="@{/tienda}"
+               th:classappend="${categoriaSeleccionada == null} ? ' activo' : ''"
+               class="filtro-categoria">Todas</a>
+            <a th:each="cat : ${listaCategorias}"
+               th:href="@{/tienda(categoria=${cat.idCategoria})}"
+               th:classappend="${categoriaSeleccionada != null and categoriaSeleccionada == cat.idCategoria} ? ' activo' : ''"
+               th:text="${cat.nombre}"
+               class="filtro-categoria">
+            </a>
+        </div>
+
         <h3 class="mb-4">Nuestros Productos</h3>
+
+        <!-- Sin resultados -->
+        <div th:if="${#lists.isEmpty(listaProductos)}" class="text-center py-5">
+            <p class="text-muted fs-5">No se encontraron productos.</p>
+        </div>
+
         <div class="row row-cols-1 row-cols-md-4 g-4">
             <div class="col" th:each="p : ${listaProductos}">
                 <div class="card product-card h-100">
@@ -44,12 +76,10 @@
                         <h5 class="card-title" th:text="${p.nombreProducto}">Nombre</h5>
                         <p class="text-danger fw-bold" th:text="'S/. ' + ${p.precioUnitario}">Precio</p>
 
-                        <!-- Usuario logueado: agrega al carrito -->
                         <a th:href="@{/carrito/agregar/{id}(id=${p.idProducto})}"
                            sec:authorize="isAuthenticated()"
                            class="btn btn-comprar w-100">Agregar al Carrito</a>
 
-                        <!-- Invitado: muestra modal -->
                         <button class="btn btn-comprar w-100"
                                 sec:authorize="!isAuthenticated()"
                                 onclick="document.getElementById('modalLogin').style.display='flex'">

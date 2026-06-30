@@ -4,6 +4,7 @@ import com.distribuidora.sanmartin.models.Cliente;
 import com.distribuidora.sanmartin.models.Envio;
 import com.distribuidora.sanmartin.models.Producto;
 import com.distribuidora.sanmartin.models.Usuario;
+import com.distribuidora.sanmartin.repository.CategoriaRepository;
 import com.distribuidora.sanmartin.repository.ClienteRepository;
 import com.distribuidora.sanmartin.repository.RepartidorRepository;
 import com.distribuidora.sanmartin.repository.UsuarioRepository;
@@ -35,6 +36,9 @@ public class ViewController {
 
     @Autowired
     private VentaService ventaService;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
     // ==========================================
     // 1. MUNDO PÚBLICO
@@ -72,8 +76,22 @@ public class ViewController {
     }
 
     @GetMapping("/tienda")
-    public String mostrarCatalogo(Model model) {
-        model.addAttribute("listaProductos", productoService.listarProductos());
+    public String mostrarCatalogo(
+            @RequestParam(required = false) Integer categoria,
+            @RequestParam(required = false) String buscar,
+            Model model) {
+
+        if (buscar != null && !buscar.isBlank()) {
+            model.addAttribute("listaProductos", productoService.buscarPorNombre(buscar));
+        } else if (categoria != null) {
+            model.addAttribute("listaProductos", productoService.filtrarPorCategoria(categoria));
+        } else {
+            model.addAttribute("listaProductos", productoService.listarProductos());
+        }
+
+        model.addAttribute("listaCategorias", categoriaRepository.findAll());
+        model.addAttribute("categoriaSeleccionada", categoria);
+        model.addAttribute("buscarTexto", buscar);
         return "catalogo";
     }
 
@@ -88,7 +106,6 @@ public class ViewController {
 
     @GetMapping("/envios")
     public String envios(Model model) {
-        // Solo mostrar pedidos con tipo Domicilio que aún no tienen envío
         model.addAttribute("listaEnvios", envioService.listarEnvios());
         model.addAttribute("listaRepartidores", repartidorRepository.findAll());
         model.addAttribute("listaPedidosDomicilio",
@@ -117,6 +134,7 @@ public class ViewController {
     @GetMapping("/productos/nuevo")
     public String mostrarFormulario(Model model) {
         model.addAttribute("producto", new Producto());
+        model.addAttribute("listaCategorias", categoriaRepository.findAll());
         return "formulario-producto";
     }
 
@@ -129,6 +147,7 @@ public class ViewController {
     @GetMapping("/productos/editar/{id}")
     public String editar(@PathVariable Integer id, Model model) {
         model.addAttribute("producto", productoService.obtenerPorId(id));
+        model.addAttribute("listaCategorias", categoriaRepository.findAll());
         return "formulario-producto";
     }
 
@@ -156,11 +175,12 @@ public class ViewController {
         model.addAttribute("listaClientes", clienteRepository.findAll());
         return "clientes";
     }
+
     @GetMapping("/clientes/{id}/pedidos")
-public String pedidosCliente(@PathVariable Integer id, Model model) {
-    Cliente cliente = clienteRepository.findById(id).orElse(null);
-    model.addAttribute("cliente", cliente);
-    model.addAttribute("listaPedidos", ventaService.listarPorCliente(id));
-    return "pedidos-cliente";
-}
+    public String pedidosCliente(@PathVariable Integer id, Model model) {
+        Cliente cliente = clienteRepository.findById(id).orElse(null);
+        model.addAttribute("cliente", cliente);
+        model.addAttribute("listaPedidos", ventaService.listarPorCliente(id));
+        return "pedidos-cliente";
+    }
 }
