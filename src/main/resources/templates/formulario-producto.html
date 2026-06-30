@@ -22,13 +22,20 @@
 
                     <div class="mb-3">
                         <label class="form-label">Categoría</label>
-                        <select th:field="*{idCategoria}" class="form-select" required>
+                        <select th:field="*{idCategoria}" id="selectCategoria" class="form-select" required>
                             <option value="">-- Selecciona una categoría --</option>
                             <option th:each="cat : ${listaCategorias}"
                                     th:value="${cat.idCategoria}"
                                     th:text="${cat.nombre}">
                             </option>
+                            <option value="nueva">+ Crear nueva categoría...</option>
                         </select>
+
+                        <!-- Campo oculto para nueva categoría -->
+                        <div id="campoNuevaCategoria" style="display:none;" class="mt-2 d-flex gap-2">
+                            <input type="text" id="inputNuevaCategoria" class="form-control" placeholder="Nombre de la nueva categoría">
+                            <button type="button" id="btnAgregarCategoria" class="btn btn-success">Agregar</button>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -58,11 +65,53 @@
                         <textarea th:field="*{descripcion}" class="form-control" rows="3"></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Guardar Producto</button>
+                    <button type="submit" id="btnGuardarProducto" class="btn btn-primary">Guardar Producto</button>
                     <a href="/admin" class="btn btn-secondary">Cancelar</a>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        const selectCategoria = document.getElementById('selectCategoria');
+        const btnSubmit = document.getElementById('btnGuardarProducto');
+
+        selectCategoria.addEventListener('change', function() {
+            const campo = document.getElementById('campoNuevaCategoria');
+            if (this.value === 'nueva') {
+                campo.style.display = 'flex';
+                btnSubmit.disabled = true;
+            } else {
+                campo.style.display = 'none';
+                btnSubmit.disabled = false;
+            }
+        });
+
+        document.getElementById('btnAgregarCategoria').addEventListener('click', function() {
+            const nombre = document.getElementById('inputNuevaCategoria').value.trim();
+            if (!nombre) {
+                alert('Escribe un nombre para la categoría');
+                return;
+            }
+
+            fetch('/categorias/crear-rapido', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'nombre=' + encodeURIComponent(nombre)
+            })
+            .then(res => res.json())
+            .then(cat => {
+                const nuevaOption = document.createElement('option');
+                nuevaOption.value = cat.idCategoria;
+                nuevaOption.text = cat.nombre;
+                selectCategoria.insertBefore(nuevaOption, selectCategoria.lastElementChild);
+                selectCategoria.value = cat.idCategoria;
+                document.getElementById('campoNuevaCategoria').style.display = 'none';
+                document.getElementById('inputNuevaCategoria').value = '';
+                btnSubmit.disabled = false;
+            })
+            .catch(() => alert('Error al crear la categoría'));
+        });
+    </script>
 </body>
 </html>

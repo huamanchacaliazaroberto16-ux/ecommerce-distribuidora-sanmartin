@@ -1,5 +1,6 @@
 package com.distribuidora.sanmartin.controllers;
 
+import com.distribuidora.sanmartin.models.Categoria;
 import com.distribuidora.sanmartin.models.Cliente;
 import com.distribuidora.sanmartin.models.Envio;
 import com.distribuidora.sanmartin.models.Producto;
@@ -8,6 +9,7 @@ import com.distribuidora.sanmartin.repository.CategoriaRepository;
 import com.distribuidora.sanmartin.repository.ClienteRepository;
 import com.distribuidora.sanmartin.repository.RepartidorRepository;
 import com.distribuidora.sanmartin.repository.UsuarioRepository;
+import com.distribuidora.sanmartin.services.CategoriaService;
 import com.distribuidora.sanmartin.services.EnvioService;
 import com.distribuidora.sanmartin.services.ProductoService;
 import com.distribuidora.sanmartin.services.VentaService;
@@ -39,6 +41,9 @@ public class ViewController {
 
     @Autowired
     private CategoriaRepository categoriaRepository;
+
+    @Autowired
+    private CategoriaService categoriaService;
 
     // ==========================================
     // 1. MUNDO PÚBLICO
@@ -155,6 +160,15 @@ public class ViewController {
     public String eliminar(@PathVariable Integer id) {
         productoService.eliminar(id);
         return "redirect:/productos";
+    }
+
+    @PostMapping("/categorias/crear-rapido")
+    @ResponseBody
+    public Categoria crearCategoriaRapido(@RequestParam String nombre) {
+        Categoria nueva = new Categoria();
+        nueva.setNombre(nombre);
+        categoriaService.guardar(nueva);
+        return nueva;
     }
 
     @GetMapping("/pedidos")
