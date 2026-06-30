@@ -156,4 +156,11 @@ public class ViewController {
         model.addAttribute("listaClientes", clienteRepository.findAll());
         return "clientes";
     }
+    @GetMapping("/clientes/{id}/pedidos")
+public String pedidosCliente(@PathVariable Integer id, Model model) {
+    Cliente cliente = clienteRepository.findById(id).orElse(null);
+    model.addAttribute("cliente", cliente);
+    model.addAttribute("listaPedidos", ventaService.listarPorCliente(id));
+    return "pedidos-cliente";
+}
 }
