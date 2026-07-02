@@ -144,10 +144,16 @@ public class ViewController {
     }
 
     @PostMapping("/productos/guardar")
-    public String guardarProducto(Producto producto) {
+     public String guardarProducto(@jakarta.validation.Valid Producto producto,
+                               org.springframework.validation.BindingResult result,
+                               Model model) {
+        if (result.hasErrors()) {
+        model.addAttribute("listaCategorias", categoriaRepository.findAll());
+        return "formulario-producto";
+       }
         productoService.guardar(producto);
-        return "redirect:/admin";
-    }
+       return "redirect:/admin";
+      }
 
     @GetMapping("/productos/editar/{id}")
     public String editar(@PathVariable Integer id, Model model) {
