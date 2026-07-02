@@ -29,7 +29,6 @@ public class CarritoController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // Ver carrito
     @GetMapping
     public String verCarrito(HttpSession session, Model model) {
         List<ItemCarrito> carrito = obtenerCarrito(session);
@@ -39,7 +38,6 @@ public class CarritoController {
         return "carrito";
     }
 
-    // Agregar producto
     @GetMapping("/agregar/{id}")
     public String agregar(@PathVariable Integer id, HttpSession session) {
         Producto producto = productoService.obtenerPorId(id);
@@ -65,7 +63,6 @@ public class CarritoController {
         return "redirect:/tienda";
     }
 
-    // Eliminar producto
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Integer id, HttpSession session) {
         List<ItemCarrito> carrito = obtenerCarrito(session);
@@ -74,14 +71,32 @@ public class CarritoController {
         return "redirect:/carrito";
     }
 
-    // Vaciar carrito
+    // NUEVO: Cambiar cantidad de un producto en el carrito
+    @PostMapping("/cantidad")
+    public String cambiarCantidad(@RequestParam Integer idProducto,
+                                   @RequestParam Integer cantidad,
+                                   HttpSession session) {
+        List<ItemCarrito> carrito = obtenerCarrito(session);
+        if (cantidad <= 0) {
+            carrito.removeIf(item -> item.getIdProducto().equals(idProducto));
+        } else {
+            for (ItemCarrito item : carrito) {
+                if (item.getIdProducto().equals(idProducto)) {
+                    item.setCantidad(cantidad);
+                    break;
+                }
+            }
+        }
+        session.setAttribute("carrito", carrito);
+        return "redirect:/carrito";
+    }
+
     @GetMapping("/vaciar")
     public String vaciar(HttpSession session) {
         session.removeAttribute("carrito");
         return "redirect:/carrito";
     }
 
-    // Confirmar pedido
     @PostMapping("/confirmar")
     public String confirmar(HttpSession session,
                             Authentication authentication,
@@ -97,7 +112,6 @@ public class CarritoController {
         return "redirect:/tienda?pedido=ok";
     }
 
-    // Método auxiliar
     @SuppressWarnings("unchecked")
     private List<ItemCarrito> obtenerCarrito(HttpSession session) {
         List<ItemCarrito> carrito = (List<ItemCarrito>) session.getAttribute("carrito");

@@ -20,17 +20,15 @@
 <div class="container">
     <h3 class="mb-4">🛒 Mi Carrito</h3>
 
-    <!-- Carrito vacío -->
     <div th:if="${#lists.isEmpty(carrito)}" class="text-center py-5">
         <p class="text-muted fs-5">Tu carrito está vacío.</p>
         <a href="/tienda" class="btn btn-danger px-4">Ver Productos</a>
     </div>
 
-    <!-- Carrito con productos -->
     <div th:if="${!#lists.isEmpty(carrito)}">
         <div class="card shadow-sm mb-4">
             <div class="card-body p-0">
-                <table class="table table-hover mb-0">
+                <table class="table table-hover mb-0 align-middle">
                     <thead class="table-dark">
                         <tr>
                             <th>Producto</th>
@@ -44,7 +42,17 @@
                         <tr th:each="item : ${carrito}">
                             <td th:text="${item.nombreProducto}"></td>
                             <td th:text="'S/. ' + ${item.precioUnitario}"></td>
-                            <td th:text="${item.cantidad}"></td>
+                            <td>
+                                <!-- Control de cantidad -->
+                                <form th:action="@{/carrito/cantidad}" method="post" class="d-flex align-items-center gap-1">
+                                    <input type="hidden" name="idProducto" th:value="${item.idProducto}">
+                                    <button type="submit" name="cantidad" th:value="${item.cantidad - 1}"
+                                            class="btn btn-sm btn-outline-secondary">−</button>
+                                    <span class="px-2 fw-bold" th:text="${item.cantidad}"></span>
+                                    <button type="submit" name="cantidad" th:value="${item.cantidad + 1}"
+                                            class="btn btn-sm btn-outline-secondary">+</button>
+                                </form>
+                            </td>
                             <td th:text="'S/. ' + ${item.subtotal}"></td>
                             <td>
                                 <a th:href="@{/carrito/eliminar/{id}(id=${item.idProducto})}"
@@ -56,20 +64,17 @@
             </div>
         </div>
 
-        <!-- Total -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <a href="/carrito/vaciar" class="btn btn-outline-secondary">Vaciar Carrito</a>
             <h5>Total: <span class="text-danger fw-bold" th:text="'S/. ' + ${total}"></span></h5>
         </div>
 
-        <!-- Formulario de confirmación con tipo de entrega -->
         <div class="card shadow-sm">
             <div class="card-header bg-danger text-white">
                 <h5 class="mb-0">Confirmar Pedido</h5>
             </div>
             <div class="card-body">
                 <form th:action="@{/carrito/confirmar}" method="post">
-
                     <div class="mb-3">
                         <label class="form-label fw-bold">¿Cómo deseas recibir tu pedido?</label>
                         <div class="form-check">
@@ -90,7 +95,6 @@
                         </div>
                     </div>
 
-                    <!-- Campo dirección, oculto por defecto -->
                     <div id="campoDir" style="display:none;" class="mb-3">
                         <label class="form-label">Dirección de entrega</label>
                         <input type="text" name="direccionEntrega" class="form-control"
@@ -98,9 +102,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-danger px-5">
-                            Confirmar Pedido
-                        </button>
+                        <button type="submit" class="btn btn-danger px-5">Confirmar Pedido</button>
                     </div>
                 </form>
             </div>

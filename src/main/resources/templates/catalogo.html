@@ -59,7 +59,11 @@
                class="filtro-categoria">
             </a>
         </div>
-
+        <!-- Mensaje de pedido confirmado -->
+        <div th:if="${param.pedido}" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+         ¡Tu pedido fue confirmado exitosamente! Pronto nos pondremos en contacto contigo.
+         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
         <h3 class="mb-4">Nuestros Productos</h3>
 
         <!-- Sin resultados -->
