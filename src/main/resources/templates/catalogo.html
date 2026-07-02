@@ -23,11 +23,12 @@
             <a class="navbar-brand fw-bold text-danger" href="/tienda">SAN MARTÍN</a>
             <div class="d-flex gap-2 align-items-center">
                 <div sec:authorize="isAuthenticated()">
-                    <a href="/carrito" class="btn btn-outline-danger px-3 me-2">🛒 Mi Carrito</a>
-                    <form th:action="@{/logout}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-danger px-3">Cerrar Sesión</button>
-                    </form>
-                </div>
+                   <a href="/mis-pedidos" class="btn btn-outline-secondary px-3 me-2">📋 Mis Pedidos</a>
+              <a href="/carrito" class="btn btn-outline-danger px-3 me-2">🛒 Mi Carrito</a>
+               <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger px-3">Cerrar Sesión</button>
+               </form>
+           </div>
                 <div sec:authorize="!isAuthenticated()">
                     <a href="/login" class="btn btn-danger px-4">Iniciar Sesión</a>
                 </div>
@@ -43,7 +44,7 @@
                 <input type="text" name="buscar" th:value="${buscarTexto}"
                        class="form-control form-control-lg"
                        placeholder="Buscar productos...">
-                <button class="btn btn-danger px-4" type="submit">🔍 Buscar</button>
+                <button class="btn btn-danger px-4" type="submit"> Buscar</button>
             </div>
         </form>
 

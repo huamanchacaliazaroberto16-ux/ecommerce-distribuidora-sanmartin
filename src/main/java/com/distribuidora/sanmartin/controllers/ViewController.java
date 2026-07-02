@@ -14,6 +14,7 @@ import com.distribuidora.sanmartin.services.EnvioService;
 import com.distribuidora.sanmartin.services.ProductoService;
 import com.distribuidora.sanmartin.services.VentaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -99,6 +100,18 @@ public class ViewController {
         model.addAttribute("buscarTexto", buscar);
         return "catalogo";
     }
+    @GetMapping("/mis-pedidos")
+public String misPedidos(Model model, Authentication authentication) {
+    String username = authentication.getName();
+    Usuario usuario = usuarioRepository.findByUsername(username);
+    Cliente cliente = clienteRepository.findByIdUsuario(usuario.getId_usuario());
+    if (cliente != null) {
+        model.addAttribute("listaPedidos", ventaService.listarPorCliente(cliente.getIdCliente()));
+    } else {
+        model.addAttribute("listaPedidos", new java.util.ArrayList<>());
+    }
+    return "mis-pedidos";
+}
 
     // ==========================================
     // 2. MUNDO ADMINISTRATIVO
