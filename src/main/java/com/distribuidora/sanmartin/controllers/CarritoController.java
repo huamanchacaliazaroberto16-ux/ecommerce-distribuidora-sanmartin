@@ -3,6 +3,7 @@ package com.distribuidora.sanmartin.controllers;
 import com.distribuidora.sanmartin.models.ItemCarrito;
 import com.distribuidora.sanmartin.models.Producto;
 import com.distribuidora.sanmartin.models.Usuario;
+import com.distribuidora.sanmartin.models.Venta;
 import com.distribuidora.sanmartin.repository.UsuarioRepository;
 import com.distribuidora.sanmartin.services.ProductoService;
 import com.distribuidora.sanmartin.services.VentaService;
@@ -71,7 +72,6 @@ public class CarritoController {
         return "redirect:/carrito";
     }
 
-    // NUEVO: Cambiar cantidad de un producto en el carrito
     @PostMapping("/cantidad")
     public String cambiarCantidad(@RequestParam Integer idProducto,
                                    @RequestParam Integer cantidad,
@@ -106,10 +106,36 @@ public class CarritoController {
         if (!carrito.isEmpty()) {
             String username = authentication.getName();
             Usuario usuario = usuarioRepository.findByUsername(username);
-            ventaService.crearVenta(carrito, usuario.getId_usuario(), tipoEntrega, direccionEntrega);
+
+            // Guardar resumen antes de vaciar
+            List<ItemCarrito> resumen = new ArrayList<>(carrito);
+            session.setAttribute("ultimoResumen", resumen);
+
+            Venta venta = ventaService.crearVenta(carrito, usuario.getId_usuario(),
+                                                   tipoEntrega, direccionEntrega);
+            session.setAttribute("ultimaVenta", venta);
             session.removeAttribute("carrito");
         }
-        return "redirect:/tienda?pedido=ok";
+        return "redirect:/carrito/resumen";
+    }
+
+    @GetMapping("/resumen")
+    public String resumen(HttpSession session, Model model) {
+        Venta venta = (Venta) session.getAttribute("ultimaVenta");
+        List<ItemCarrito> resumen = (List<ItemCarrito>) session.getAttribute("ultimoResumen");
+
+        if (venta == null) {
+            return "redirect:/tienda";
+        }
+
+        double total = resumen != null
+            ? resumen.stream().mapToDouble(ItemCarrito::getSubtotal).sum()
+            : 0;
+
+        model.addAttribute("venta", venta);
+        model.addAttribute("resumen", resumen);
+        model.addAttribute("total", total);
+        return "resumen-pedido";
     }
 
     @SuppressWarnings("unchecked")
