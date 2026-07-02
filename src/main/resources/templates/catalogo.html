@@ -78,7 +78,10 @@
                     <img th:src="${p.urlImagen}" class="card-img-top"
                          onerror="this.src='https://via.placeholder.com/200'">
                     <div class="card-body">
+                        <a th:href="@{/producto/{id}(id=${p.idProducto})}"
+                         class="text-decoration-none text-dark">
                         <h5 class="card-title" th:text="${p.nombreProducto}">Nombre</h5>
+                        </a>
                         <p class="text-danger fw-bold" th:text="'S/. ' + ${p.precioUnitario}">Precio</p>
 
                         <a th:href="@{/carrito/agregar/{id}(id=${p.idProducto})}"

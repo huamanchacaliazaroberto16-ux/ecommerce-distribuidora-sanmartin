@@ -100,6 +100,12 @@ public class ViewController {
         model.addAttribute("buscarTexto", buscar);
         return "catalogo";
     }
+    @GetMapping("/producto/{id}")
+public String detalleProducto(@PathVariable Integer id, Model model) {
+    model.addAttribute("producto", productoService.obtenerPorId(id));
+    model.addAttribute("listaCategorias", categoriaRepository.findAll());
+    return "detalle-producto";
+}
     @GetMapping("/mis-pedidos")
 public String misPedidos(Model model, Authentication authentication) {
     String username = authentication.getName();
