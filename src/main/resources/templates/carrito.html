@@ -3,113 +3,203 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Carrito | San Martín</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .top-bar { background: #222; color: #ccc; font-size: 12px; padding: 6px 0; }
+        .navbar-main { background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 12px 0; }
+        .brand-logo { font-size: 22px; font-weight: 900; color: #d32f2f; text-decoration: none; }
+        .brand-logo:hover { color: #b30000; }
+        .brand-sub { font-size: 11px; color: #888; display: block; font-weight: 400; }
+        .page-header { background: linear-gradient(135deg, #b30000, #d32f2f); color: white; padding: 30px 0; margin-bottom: 30px; }
+        .carrito-card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .tabla-carrito thead { background: #d32f2f; color: white; }
+        .tabla-carrito thead th { border: none; padding: 14px 16px; font-weight: 600; }
+        .tabla-carrito tbody td { padding: 14px 16px; vertical-align: middle; border-color: #f0f0f0; }
+        .btn-cantidad { width: 32px; height: 32px; border-radius: 8px; border: 2px solid #dee2e6; background: white; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .btn-cantidad:hover { border-color: #d32f2f; color: #d32f2f; }
+        .cantidad-num { min-width: 35px; text-align: center; font-weight: 700; font-size: 16px; }
+        .btn-eliminar { background: none; border: 2px solid #dc3545; color: #dc3545; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; transition: all 0.2s; }
+        .btn-eliminar:hover { background: #dc3545; color: white; }
+        .resumen-card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .resumen-card .card-header { background: #d32f2f; color: white; border-radius: 15px 15px 0 0; padding: 16px 20px; }
+        .btn-confirmar { background: #d32f2f; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 16px; font-weight: 700; width: 100%; transition: background 0.2s; }
+        .btn-confirmar:hover { background: #b30000; color: white; }
+        .btn-vaciar { border: 2px solid #dee2e6; background: white; color: #666; border-radius: 10px; padding: 10px 20px; font-size: 14px; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .btn-vaciar:hover { border-color: #dc3545; color: #dc3545; }
+        .carrito-vacio { text-align: center; padding: 60px 20px; }
+        .carrito-vacio .icono { font-size: 80px; margin-bottom: 20px; }
+        .radio-entrega { border: 2px solid #eee; border-radius: 10px; padding: 15px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .radio-entrega:has(input:checked) { border-color: #d32f2f; background: #fff5f5; }
+        @media (max-width: 576px) {
+            .top-bar { display: none; }
+            .tabla-carrito thead { display: none; }
+            .tabla-carrito tbody td { display: block; border: none; padding: 8px 16px; }
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-light bg-white shadow-sm mb-4">
-    <div class="container">
-        <a class="navbar-brand fw-bold text-danger" href="/tienda">← Seguir comprando</a>
-        <form th:action="@{/logout}" method="post" class="d-inline">
-            <button type="submit" class="btn btn-outline-danger btn-sm">Cerrar Sesión</button>
-        </form>
+<!-- Top bar -->
+<div class="top-bar d-none d-md-block">
+    <div class="container d-flex justify-content-between">
+        <span>📞 342-444-0263 &nbsp;|&nbsp; 📍 Pachacutec, Carretera de Tate, Ica</span>
+        <span>✉️ pedidos@distribuidorasanmartin.com</span>
+    </div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar-main">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="/tienda" class="brand-logo">
+            🏪 SAN MARTÍN
+            <span class="brand-sub">Distribuidora Online</span>
+        </a>
+        <div class="d-flex gap-2">
+            <a href="/tienda" class="btn btn-outline-danger btn-sm">← Seguir comprando</a>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger btn-sm">Salir</button>
+            </form>
+        </div>
     </div>
 </nav>
 
-<div class="container">
-    <h3 class="mb-4">🛒 Mi Carrito</h3>
+<!-- Header página -->
+<div class="page-header">
+    <div class="container">
+        <h2 class="fw-bold mb-0">🛒 Mi Carrito</h2>
+        <p class="mb-0 opacity-75 mt-1">Revisa tus productos antes de confirmar</p>
+    </div>
+</div>
 
-    <div th:if="${#lists.isEmpty(carrito)}" class="text-center py-5">
-        <p class="text-muted fs-5">Tu carrito está vacío.</p>
-        <a href="/tienda" class="btn btn-danger px-4">Ver Productos</a>
+<div class="container pb-5">
+
+    <!-- Carrito vacío -->
+    <div th:if="${#lists.isEmpty(carrito)}" class="carrito-vacio">
+        <div class="icono">🛒</div>
+        <h4 class="fw-bold text-muted">Tu carrito está vacío</h4>
+        <p class="text-muted mb-4">Agrega productos desde el catálogo para comenzar</p>
+        <a href="/tienda" class="btn btn-danger px-5 py-2">Ver Productos</a>
     </div>
 
-    <div th:if="${!#lists.isEmpty(carrito)}">
-        <div class="card shadow-sm mb-4">
-            <div class="card-body p-0">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Producto</th>
-                            <th>Precio Unit.</th>
-                            <th>Cantidad</th>
-                            <th>Subtotal</th>
-                            <th>Eliminar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="item : ${carrito}">
-                            <td th:text="${item.nombreProducto}"></td>
-                            <td th:text="'S/. ' + ${item.precioUnitario}"></td>
-                            <td>
-                                <!-- Control de cantidad -->
-                                <form th:action="@{/carrito/cantidad}" method="post" class="d-flex align-items-center gap-1">
-                                    <input type="hidden" name="idProducto" th:value="${item.idProducto}">
-                                    <button type="submit" name="cantidad" th:value="${item.cantidad - 1}"
-                                            class="btn btn-sm btn-outline-secondary">−</button>
-                                    <span class="px-2 fw-bold" th:text="${item.cantidad}"></span>
-                                    <button type="submit" name="cantidad" th:value="${item.cantidad + 1}"
-                                            class="btn btn-sm btn-outline-secondary">+</button>
-                                </form>
-                            </td>
-                            <td th:text="'S/. ' + ${item.subtotal}"></td>
-                            <td>
-                                <a th:href="@{/carrito/eliminar/{id}(id=${item.idProducto})}"
-                                   class="btn btn-sm btn-outline-danger">✕</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <!-- Carrito con productos -->
+    <div th:if="${!#lists.isEmpty(carrito)}" class="row g-4">
+
+        <!-- Tabla productos -->
+        <div class="col-lg-8">
+            <div class="carrito-card card">
+                <div class="card-body p-0">
+                    <table class="table tabla-carrito mb-0">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item : ${carrito}">
+                                <td>
+                                    <span class="fw-600" th:text="${item.nombreProducto}"></span>
+                                </td>
+                                <td class="text-danger fw-bold" th:text="'S/. ' + ${item.precioUnitario}"></td>
+                                <td>
+                                    <form th:action="@{/carrito/cantidad}" method="post" class="d-flex align-items-center gap-1">
+                                        <input type="hidden" name="idProducto" th:value="${item.idProducto}">
+                                        <button type="submit" name="cantidad" th:value="${item.cantidad - 1}" class="btn-cantidad">−</button>
+                                        <span class="cantidad-num" th:text="${item.cantidad}"></span>
+                                        <button type="submit" name="cantidad" th:value="${item.cantidad + 1}" class="btn-cantidad">+</button>
+                                    </form>
+                                </td>
+                                <td class="fw-bold" th:text="'S/. ' + ${item.subtotal}"></td>
+                                <td>
+                                    <a th:href="@{/carrito/eliminar/{id}(id=${item.idProducto})}" class="btn-eliminar">✕</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-white p-3 d-flex justify-content-between align-items-center" style="border-radius: 0 0 15px 15px;">
+                    <a href="/carrito/vaciar" class="btn-vaciar">🗑️ Vaciar Carrito</a>
+                    <div class="text-end">
+                        <span class="text-muted small">Total provisional</span>
+                        <div class="text-danger fw-bold fs-5" th:text="'S/. ' + ${total}"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <a href="/carrito/vaciar" class="btn btn-outline-secondary">Vaciar Carrito</a>
-            <h5>Total: <span class="text-danger fw-bold" th:text="'S/. ' + ${total}"></span></h5>
-        </div>
+        <!-- Resumen y confirmar -->
+        <div class="col-lg-4">
+            <div class="resumen-card card">
+                <div class="card-header">
+                    <h5 class="mb-0 fw-bold">📋 Confirmar Pedido</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/carrito/confirmar}" method="post">
 
-        <div class="card shadow-sm">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0">Confirmar Pedido</h5>
-            </div>
-            <div class="card-body">
-                <form th:action="@{/carrito/confirmar}" method="post">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">¿Cómo deseas recibir tu pedido?</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="tipoEntrega"
-                                   id="tienda" value="Tienda" checked
-                                   onclick="document.getElementById('campoDir').style.display='none'">
-                            <label class="form-check-label" for="tienda">
-                                🏪 Recoger en tienda
-                            </label>
+                        <p class="fw-bold mb-3">¿Cómo deseas recibir tu pedido?</p>
+
+                        <label class="radio-entrega d-block">
+                            <div class="d-flex align-items-center gap-3">
+                                <input type="radio" name="tipoEntrega" value="Tienda" checked
+                                       onchange="toggleDir(this.value)">
+                                <div>
+                                    <div class="fw-bold">🏪 Recoger en tienda</div>
+                                    <small class="text-muted">Pachacutec, Carretera de Tate, Ica</small>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="radio-entrega d-block">
+                            <div class="d-flex align-items-center gap-3">
+                                <input type="radio" name="tipoEntrega" value="Domicilio"
+                                       onchange="toggleDir(this.value)">
+                                <div>
+                                    <div class="fw-bold">🚚 Envío a domicilio</div>
+                                    <small class="text-muted">Cobertura en Ica</small>
+                                </div>
+                            </div>
+                        </label>
+
+                        <div id="campoDir" style="display:none;" class="mb-3 mt-2">
+                            <label class="form-label small fw-bold text-muted">DIRECCIÓN DE ENTREGA</label>
+                            <input type="text" name="direccionEntrega" class="form-control"
+                                   placeholder="Ej: Av. Los Jardines 123, Ica">
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="tipoEntrega"
-                                   id="domicilio" value="Domicilio"
-                                   onclick="document.getElementById('campoDir').style.display='block'">
-                            <label class="form-check-label" for="domicilio">
-                                🚚 Envío a domicilio
-                            </label>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Subtotal</span>
+                            <span th:text="'S/. ' + ${total}"></span>
                         </div>
-                    </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">IGV (18%)</span>
+                            <span th:text="'S/. ' + ${#numbers.formatDecimal(total * 0.18, 1, 2)}"></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-4 fw-bold fs-5">
+                            <span>Total</span>
+                            <span class="text-danger" th:text="'S/. ' + ${#numbers.formatDecimal(total * 1.18, 1, 2)}"></span>
+                        </div>
 
-                    <div id="campoDir" style="display:none;" class="mb-3">
-                        <label class="form-label">Dirección de entrega</label>
-                        <input type="text" name="direccionEntrega" class="form-control"
-                               placeholder="Ej: Av. Los Jardines 123, Ica">
-                    </div>
-
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-danger px-5">Confirmar Pedido</button>
-                    </div>
-                </form>
+                        <button type="submit" class="btn-confirmar">✅ Confirmar Pedido</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleDir(val) {
+    document.getElementById('campoDir').style.display = val === 'Domicilio' ? 'block' : 'none';
+}
+</script>
 </body>
 </html>

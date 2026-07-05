@@ -2,68 +2,112 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedido Confirmado | San Martín</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .resumen-card { border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .icono-check { font-size: 60px; color: #27ae60; }
+        body { background: #f8f9fa; }
+        .top-bar { background: #222; color: #ccc; font-size: 12px; padding: 6px 0; }
+        .navbar-main { background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 12px 0; }
+        .brand-logo { font-size: 22px; font-weight: 900; color: #d32f2f; text-decoration: none; }
+        .brand-sub { font-size: 11px; color: #888; display: block; font-weight: 400; }
+        .success-banner {
+            background: linear-gradient(135deg, #1a7a1a, #28a745);
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+            margin-bottom: 30px;
+        }
+        .success-icon { font-size: 70px; margin-bottom: 15px; }
+        .success-banner h2 { font-weight: 800; font-size: 2rem; }
+        .info-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .info-card .card-header {
+            background: #d32f2f;
+            color: white;
+            padding: 14px 20px;
+            font-weight: 700;
+        }
+        .tabla-resumen thead { background: #f8f9fa; }
+        .tabla-resumen thead th { border: none; padding: 12px 16px; color: #666; font-size: 13px; }
+        .tabla-resumen tbody td { padding: 12px 16px; vertical-align: middle; border-color: #f0f0f0; }
+        .badge-pendiente { background: #ffc107; color: #333; padding: 6px 12px; border-radius: 20px; font-size: 13px; }
+        .badge-tienda { background: #6c757d; color: white; padding: 6px 12px; border-radius: 20px; font-size: 13px; }
+        .badge-domicilio { background: #0d6efd; color: white; padding: 6px 12px; border-radius: 20px; font-size: 13px; }
+        .btn-continuar { background: #d32f2f; color: white; border: none; border-radius: 10px; padding: 12px 30px; font-weight: 700; text-decoration: none; display: inline-block; transition: background 0.2s; }
+        .btn-continuar:hover { background: #b30000; color: white; }
+        .btn-pedidos { background: white; color: #d32f2f; border: 2px solid #d32f2f; border-radius: 10px; padding: 12px 30px; font-weight: 700; text-decoration: none; display: inline-block; transition: all 0.2s; }
+        .btn-pedidos:hover { background: #d32f2f; color: white; }
+        @media (max-width: 576px) { .top-bar { display: none; } }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-light bg-white shadow-sm mb-4">
-    <div class="container">
-        <a class="navbar-brand fw-bold text-danger" href="/tienda">SAN MARTÍN</a>
+<!-- Top bar -->
+<div class="top-bar d-none d-md-block">
+    <div class="container d-flex justify-content-between">
+        <span>📞 342-444-0263 &nbsp;|&nbsp; 📍 Pachacutec, Carretera de Tate, Ica</span>
+        <span>✉️ pedidos@distribuidorasanmartin.com</span>
+    </div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar-main">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="/tienda" class="brand-logo">
+            🏪 SAN MARTÍN
+            <span class="brand-sub">Distribuidora Online</span>
+        </a>
+        <a href="/tienda" class="btn btn-outline-danger btn-sm">← Volver a la Tienda</a>
     </div>
 </nav>
 
-<div class="container" style="max-width: 700px;">
+<!-- Banner éxito -->
+<div class="success-banner">
+    <div class="success-icon">✅</div>
+    <h2>¡Pedido Confirmado!</h2>
+    <p class="mb-0 opacity-90 mt-2">Tu pedido fue registrado exitosamente. Pronto nos pondremos en contacto contigo.</p>
+</div>
 
-    <!-- Encabezado éxito -->
-    <div class="text-center mb-4">
-        <div class="icono-check">✅</div>
-        <h2 class="mt-2 fw-bold">¡Pedido Confirmado!</h2>
-        <p class="text-muted">Tu pedido fue registrado exitosamente.</p>
-    </div>
+<div class="container pb-5" style="max-width: 750px;">
 
-    <!-- Datos del pedido -->
-    <div class="card resumen-card mb-4">
-        <div class="card-header bg-danger text-white">
-            <h5 class="mb-0">📋 Resumen del Pedido #<span th:text="${venta.idVenta}"></span></h5>
-        </div>
-        <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-6">
-                    <strong>Fecha:</strong>
-                    <p th:text="${venta.fechaVenta}"></p>
+    <!-- Info del pedido -->
+    <div class="info-card card">
+        <div class="card-header">📋 Resumen del Pedido #<span th:text="${venta.idVenta}"></span></div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <small class="text-muted d-block">FECHA</small>
+                    <span class="fw-bold" th:text="${venta.fechaVenta}"></span>
                 </div>
-                <div class="col-6">
-                    <strong>Tipo de entrega:</strong>
-                    <p th:text="${venta.tipoEntrega}"></p>
+                <div class="col-sm-6">
+                    <small class="text-muted d-block">ESTADO</small>
+                    <span class="badge-pendiente" th:text="${venta.estadoPago}"></span>
                 </div>
-            </div>
-            <div th:if="${venta.direccionEntrega != null}" class="mb-3">
-                <strong>Dirección de entrega:</strong>
-                <p th:text="${venta.direccionEntrega}"></p>
-            </div>
-            <div class="row">
-                <div class="col-4">
-                    <strong>Estado:</strong>
-                    <p><span class="badge bg-warning text-dark" th:text="${venta.estadoPago}"></span></p>
+                <div class="col-sm-6">
+                    <small class="text-muted d-block">TIPO DE ENTREGA</small>
+                    <span th:classappend="${venta.tipoEntrega == 'Domicilio'} ? 'badge-domicilio' : 'badge-tienda'"
+                          th:text="${venta.tipoEntrega}"></span>
+                </div>
+                <div class="col-sm-6" th:if="${venta.direccionEntrega != null}">
+                    <small class="text-muted d-block">DIRECCIÓN</small>
+                    <span class="fw-bold" th:text="${venta.direccionEntrega}"></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Productos comprados -->
-    <div class="card resumen-card mb-4">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">🛒 Productos</h5>
-        </div>
+    <!-- Productos -->
+    <div class="info-card card">
+        <div class="card-header">🛒 Productos Comprados</div>
         <div class="card-body p-0">
-            <table class="table mb-0">
-                <thead class="table-light">
+            <table class="table tabla-resumen mb-0">
+                <thead>
                     <tr>
                         <th>Producto</th>
                         <th>Precio Unit.</th>
@@ -73,29 +117,38 @@
                 </thead>
                 <tbody>
                     <tr th:each="item : ${resumen}">
-                        <td th:text="${item.nombreProducto}"></td>
+                        <td class="fw-600" th:text="${item.nombreProducto}"></td>
                         <td th:text="'S/. ' + ${item.precioUnitario}"></td>
                         <td th:text="${item.cantidad}"></td>
-                        <td th:text="'S/. ' + ${item.subtotal}"></td>
+                        <td class="fw-bold text-danger" th:text="'S/. ' + ${item.subtotal}"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <div class="card-footer d-flex justify-content-between">
-            <div>
-                <small class="text-muted">Subtotal: <strong th:text="'S/. ' + ${venta.subtotal}"></strong></small><br>
-                <small class="text-muted">IGV (18%): <strong th:text="'S/. ' + ${venta.igv}"></strong></small>
+        <div class="card-footer bg-white p-4">
+            <div class="d-flex justify-content-between text-muted mb-1">
+                <span>Subtotal</span>
+                <span th:text="'S/. ' + ${venta.subtotal}"></span>
             </div>
-            <h5 class="text-danger">Total: <strong th:text="'S/. ' + ${venta.totalPagar}"></strong></h5>
+            <div class="d-flex justify-content-between text-muted mb-2">
+                <span>IGV (18%)</span>
+                <span th:text="'S/. ' + ${venta.igv}"></span>
+            </div>
+            <div class="d-flex justify-content-between fw-bold fs-5">
+                <span>Total Pagado</span>
+                <span class="text-danger" th:text="'S/. ' + ${venta.totalPagar}"></span>
+            </div>
         </div>
     </div>
 
     <!-- Botones -->
-    <div class="d-flex gap-3 justify-content-center mb-5">
-        <a href="/tienda" class="btn btn-danger px-4">Seguir Comprando</a>
-        <a href="/mis-pedidos" class="btn btn-outline-danger px-4">Ver Mis Pedidos</a>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <a href="/tienda" class="btn-continuar">🛒 Seguir Comprando</a>
+        <a href="/mis-pedidos" class="btn-pedidos">📋 Ver Mis Pedidos</a>
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

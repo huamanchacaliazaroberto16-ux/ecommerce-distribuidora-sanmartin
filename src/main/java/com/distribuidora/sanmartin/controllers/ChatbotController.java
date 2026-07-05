@@ -4,9 +4,9 @@ import com.distribuidora.sanmartin.models.Producto;
 import com.distribuidora.sanmartin.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +30,7 @@ public class ChatbotController {
         StringBuilder contexto = new StringBuilder();
         contexto.append("Eres el asistente virtual de Distribuidora San Martín. ");
         contexto.append("Solo responde preguntas relacionadas con los productos, stock, precios y pedidos de la tienda. ");
+        contexto.append("Si te preguntan algo fuera de ese tema, redirige amablemente. ");
         contexto.append("Estos son los productos disponibles actualmente:\n\n");
 
         for (Producto p : productos) {
@@ -42,30 +43,28 @@ public class ChatbotController {
             contexto.append("\n");
         }
         contexto.append("\nPregunta del cliente: ").append(pregunta);
-        contexto.append("\nResponde de forma breve, amigable y en español.");
-
-        // Llamar a Gemini API
-        WebClient client = WebClient.create();
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + geminiApiKey;
-
-        Map<String, Object> requestBody = Map.of(
-            "contents", List.of(
-                Map.of("parts", List.of(
-                    Map.of("text", contexto.toString())
-                ))
-            )
-        );
+        contexto.append("\nResponde de forma breve, amigable y en español. Máximo 3 oraciones.");
 
         try {
-            Map response = client.post()
-                .uri(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
 
-            List candidates = (List) response.get("candidates");
+            Map<String, Object> requestBody = Map.of(
+                "contents", List.of(
+                    Map.of("parts", List.of(
+                        Map.of("text", contexto.toString())
+                    ))
+                )
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+            Map responseBody = response.getBody();
+
+            List candidates = (List) responseBody.get("candidates");
             Map candidate = (Map) candidates.get(0);
             Map content = (Map) candidate.get("content");
             List parts = (List) content.get("parts");
@@ -73,8 +72,10 @@ public class ChatbotController {
             String respuesta = (String) part.get("text");
 
             return Map.of("respuesta", respuesta);
+
         } catch (Exception e) {
-            return Map.of("respuesta", "Lo siento, no pude procesar tu consulta en este momento. Intenta de nuevo.");
+            System.err.println("Error Gemini: " + e.getMessage());
+            return Map.of("respuesta", "Lo siento, no pude procesar tu consulta: " + e.getMessage());
         }
     }
 }
