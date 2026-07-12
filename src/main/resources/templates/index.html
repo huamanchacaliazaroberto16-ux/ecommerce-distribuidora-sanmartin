@@ -3,171 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Distribuidora San Martín - Sistema de Gestión</title>
+    <title>Panel Admin | San Martín</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
 
-        body {
-            background-color: #f5f6fa;
-            color: #333;
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background: #1a1a2e;
+            position: fixed;
+            top: 0; left: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
         }
-
-        /* Barra de navegación superior con el rojo de la marca */
-        header {
-            background-color: #b30000;
-            color: white;
-            padding: 20px 40px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        header h1 {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        /* Contenedor Principal */
-        main {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .welcome-section {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            margin-bottom: 40px;
-            border-left: 5px solid #d63031;
-        }
-
-        .welcome-section h2 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        /* Grid de Accesos Directos */
-        .modules-grid {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
-            border-collapse: separate;
-            border-spacing: 20px;
-        }
-
-        .module-row {
-            display: table-row;
-        }
-
-        .module-card {
-            display: table-cell;
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
+        .sidebar-logo {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
-            vertical-align: top;
         }
-
-        .module-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-
-        .module-card h3 {
-            color: #b30000;
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .module-card p {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-
-        /* Botones con estilo rojo elegante */
-        .btn-access {
-            display: inline-block;
-            background-color: #d63031;
-            color: white;
+        .sidebar-logo img { height: 50px; object-fit: contain; filter: brightness(0) invert(1); }
+        .sidebar-logo span { display: block; color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 5px; }
+        .sidebar-nav { padding: 20px 0; flex: 1; }
+        .nav-section { padding: 8px 20px; color: rgba(255,255,255,0.3); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.7);
             text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
             font-size: 14px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
         }
-
-        .btn-access:hover {
-            background-color: #b30000;
+        .nav-item-link:hover {
+            background: rgba(255,255,255,0.08);
+            color: white;
+            border-left-color: #d32f2f;
         }
-
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            color: #888;
-            font-size: 13px;
+        .nav-item-link .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        .sidebar-footer {
             padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(211,47,47,0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(211,47,47,0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            width: 100%;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { background: #d32f2f; color: white; }
+
+        /* Main content */
+        .main-content { margin-left: 260px; padding: 30px; min-height: 100vh; }
+
+        /* Top header */
+        .top-header { background: white; border-radius: 12px; padding: 20px 25px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .top-header h1 { font-size: 22px; font-weight: 800; color: #222; margin: 0; }
+        .top-header p { color: #888; font-size: 13px; margin: 0; }
+        .admin-badge { background: #d32f2f; color: white; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+
+        /* Stats cards */
+        .stat-card { background: white; border-radius: 12px; padding: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid; height: 100%; }
+        .stat-card.rojo { border-left-color: #d32f2f; }
+        .stat-card.azul { border-left-color: #1976d2; }
+        .stat-card.verde { border-left-color: #388e3c; }
+        .stat-card.naranja { border-left-color: #f57c00; }
+        .stat-icon { font-size: 32px; margin-bottom: 10px; }
+        .stat-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 28px; font-weight: 800; color: #222; }
+
+        /* Module cards */
+        .module-card {
+            background: white;
+            border-radius: 15px;
+            padding: 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-decoration: none;
+            display: block;
+            transition: all 0.2s;
+            height: 100%;
+            border: 2px solid transparent;
+        }
+        .module-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); border-color: #d32f2f; }
+        .module-icon { font-size: 40px; margin-bottom: 15px; }
+        .module-card h5 { font-weight: 700; color: #222; margin-bottom: 8px; }
+        .module-card p { color: #666; font-size: 13px; margin: 0; }
+        .module-badge { display: inline-block; background: #d32f2f; color: white; font-size: 11px; padding: 3px 10px; border-radius: 20px; margin-top: 12px; font-weight: 600; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; padding: 15px; }
         }
     </style>
 </head>
 <body>
 
-    <header style="display: flex; justify-content: space-between; align-items: center;">
-    <h1>Distribuidora San Martín — Panel de Control</h1>
-    <form th:action="@{/logout}" method="post">
-        <button type="submit" style="background-color: white; color: #b30000; border: 2px solid white; padding: 8px 18px; border-radius: 5px; font-weight: bold; cursor: pointer;">
-            Cerrar Sesión
-        </button>
-    </form>
-</header>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <img src="/images/logo_empresa.png" alt="San Martín">
+        <span>Panel Administrativo</span>
+    </div>
 
-    <main>
-        <section class="welcome-section">
-            <h2>¡Bienvenido al Sistema de Gestión de E-commerce!</h2>
-            <p>Selecciona uno de los módulos internos del negocio para comenzar a operar el sistema.</p>
-        </section>
+    <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a href="/admin" class="nav-item-link">
+            <span class="nav-icon">🏠</span> Dashboard
+        </a>
 
-        <div class="modules-grid">
-            <div class="module-row">
-                
-                <div class="module-card">
-                    <h3>📦 Inventario</h3>
-                    <p>Gestión completa del catálogo de productos, control de stock y asignación de categorías para la distribuidora.</p>
-                    <a th:href="@{/productos}" class="btn-access">Ir a Productos</a>
-                </div>
+        <div class="nav-section">Gestión</div>
+        <a href="/productos" class="nav-item-link">
+            <span class="nav-icon">📦</span> Inventario
+        </a>
+        
+        <a href="/pedidos" class="nav-item-link">
+            <span class="nav-icon">📋</span> Pedidos
+        </a>
+        <a href="/clientes" class="nav-item-link">
+            <span class="nav-icon">👥</span> Clientes
+        </a>
+        <a href="/envios" class="nav-item-link">
+            <span class="nav-icon">🚚</span> Despachos
+        </a>
 
-                <div class="module-card">
-                    <h3>🚚 Despachos</h3>
-                    <p>Control de rutas de entrega, asignación de transportistas y actualización en tiempo real de los estados de envío.</p>
-                    <a th:href="@{/envios}" class="btn-access">Gestionar Envíos</a>
-                </div>
-                <div class="module-card">
-    <h3>📋 Pedidos</h3>
-    <p>Visualiza todos los pedidos realizados por los clientes con montos, fechas y estado de pago.</p>
-    <a th:href="@{/pedidos}" class="btn-access">Ver Pedidos</a>
+        <div class="nav-section">Tienda</div>
+        <a href="/tienda" class="nav-item-link" target="_blank">
+            <span class="nav-icon">🛒</span> Ver Tienda
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn-logout">
+                <span>🚪</span> Cerrar Sesión
+            </button>
+        </form>
+    </div>
 </div>
 
-                <div class="module-card">
-                    <h3>👥 Clientes</h3>
-                    <p>Administración del directorio de clientes registrados, historial de compras y preferencias de facturación.</p>
-                    <a th:href="@{/clientes}" class="btn-access">Ver Clientes</a>
-                </div>
+<!-- Contenido principal -->
+<div class="main-content">
 
+    <!-- Header -->
+    <div class="top-header">
+        <div>
+            <h1>¡Bienvenido al Panel!</h1>
+            <p>Gestiona tu tienda desde aquí — Distribuidora San Martín</p>
+        </div>
+        <span class="admin-badge">👤 Administrador</span>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card rojo">
+                <div class="stat-icon">📦</div>
+                <div class="stat-label">Productos</div>
+                <div class="stat-value" th:text="${totalProductos != null ? totalProductos : '—'}">—</div>
             </div>
         </div>
-    </main>
+        <div class="col-6 col-md-3">
+            <div class="stat-card azul">
+                <div class="stat-icon">📋</div>
+                <div class="stat-label">Pedidos</div>
+                <div class="stat-value" th:text="${totalPedidos != null ? totalPedidos : '—'}">—</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card verde">
+                <div class="stat-icon">👥</div>
+                <div class="stat-label">Clientes</div>
+                <div class="stat-value" th:text="${totalClientes != null ? totalClientes : '—'}">—</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card naranja">
+                <div class="stat-icon">🚚</div>
+                <div class="stat-label">Envíos</div>
+                <div class="stat-value" th:text="${totalEnvios != null ? totalEnvios : '—'}">—</div>
+            </div>
+        </div>
+    </div>
 
-    <footer>
-        <p>&copy; 2026 Distribuidora San Martín. Sistema de Gestión Integrador — UTP.</p>
-    </footer>
+    <!-- Módulos -->
+    <h5 class="fw-bold mb-3 text-muted" style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Módulos del Sistema</h5>
+    <div class="row g-3">
+        <div class="col-md-4 col-sm-6">
+            <a href="/productos" class="module-card">
+                <div class="module-icon">📦</div>
+                <h5>Inventario</h5>
+                <p>Gestión completa del catálogo, stock y precios de productos.</p>
+                <span class="module-badge">Gestionar →</span>
+            </a>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <a href="/pedidos" class="module-card">
+                <div class="module-icon">📋</div>
+                <h5>Pedidos</h5>
+                <p>Visualiza y gestiona todos los pedidos realizados por clientes.</p>
+                <span class="module-badge">Ver Pedidos →</span>
+            </a>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <a href="/envios" class="module-card">
+                <div class="module-icon">🚚</div>
+                <h5>Despachos</h5>
+                <p>Control de rutas, asignación de repartidores y estados de envío.</p>
+                <span class="module-badge">Gestionar →</span>
+            </a>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <a href="/clientes" class="module-card">
+                <div class="module-icon">👥</div>
+                <h5>Clientes</h5>
+                <p>Directorio de clientes registrados e historial de compras.</p>
+                <span class="module-badge">Ver Clientes →</span>
+            </a>
+        </div>
+      
+        <div class="col-md-4 col-sm-6">
+            <a href="/tienda" class="module-card" target="_blank">
+                <div class="module-icon">🛒</div>
+                <h5>Ver Tienda</h5>
+                <p>Visualiza la tienda online tal como la ven los clientes.</p>
+                <span class="module-badge">Abrir →</span>
+            </a>
+        </div>
+    </div>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

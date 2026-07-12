@@ -1,9 +1,11 @@
 package com.distribuidora.sanmartin.controllers;
 
+import com.distribuidora.sanmartin.models.Cliente;
 import com.distribuidora.sanmartin.models.ItemCarrito;
 import com.distribuidora.sanmartin.models.Producto;
 import com.distribuidora.sanmartin.models.Usuario;
 import com.distribuidora.sanmartin.models.Venta;
+import com.distribuidora.sanmartin.repository.ClienteRepository;
 import com.distribuidora.sanmartin.repository.UsuarioRepository;
 import com.distribuidora.sanmartin.services.ProductoService;
 import com.distribuidora.sanmartin.services.VentaService;
@@ -29,6 +31,9 @@ public class CarritoController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     @GetMapping
     public String verCarrito(HttpSession session, Model model) {
@@ -101,18 +106,28 @@ public class CarritoController {
     public String confirmar(HttpSession session,
                             Authentication authentication,
                             @RequestParam String tipoEntrega,
-                            @RequestParam(required = false) String direccionEntrega) {
+                            @RequestParam(required = false) String direccionEntrega,
+                            @RequestParam(required = false) String metodoPago) {
         List<ItemCarrito> carrito = obtenerCarrito(session);
         if (!carrito.isEmpty()) {
             String username = authentication.getName();
             Usuario usuario = usuarioRepository.findByUsername(username);
 
-            // Guardar resumen antes de vaciar
             List<ItemCarrito> resumen = new ArrayList<>(carrito);
             session.setAttribute("ultimoResumen", resumen);
+            session.setAttribute("ultimoUsuario", usuario);
 
-            Venta venta = ventaService.crearVenta(carrito, usuario.getId_usuario(),
-                                                   tipoEntrega, direccionEntrega);
+            // Buscar cliente para mostrar nombre completo en comprobante
+            Cliente clienteActual = clienteRepository.findByIdUsuario(usuario.getId_usuario());
+            session.setAttribute("ultimoCliente", clienteActual);
+
+            Venta venta = ventaService.crearVenta(
+                carrito,
+                usuario.getId_usuario(),
+                tipoEntrega,
+                direccionEntrega,
+                metodoPago
+            );
             session.setAttribute("ultimaVenta", venta);
             session.removeAttribute("carrito");
         }
@@ -123,6 +138,7 @@ public class CarritoController {
     public String resumen(HttpSession session, Model model) {
         Venta venta = (Venta) session.getAttribute("ultimaVenta");
         List<ItemCarrito> resumen = (List<ItemCarrito>) session.getAttribute("ultimoResumen");
+        Cliente cliente = (Cliente) session.getAttribute("ultimoCliente");
 
         if (venta == null) {
             return "redirect:/tienda";
@@ -135,6 +151,7 @@ public class CarritoController {
         model.addAttribute("venta", venta);
         model.addAttribute("resumen", resumen);
         model.addAttribute("total", total);
+        model.addAttribute("cliente", cliente);
         return "resumen-pedido";
     }
 

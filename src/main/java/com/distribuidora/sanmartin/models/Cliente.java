@@ -10,8 +10,8 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cliente") // Mapea exactamente tu clave primaria de pgAdmin
-    private Integer idCliente; // Cambiado de Long a Integer para que coincida con tu base de datos
+    @Column(name = "id_cliente")
+    private Integer idCliente;
 
     @Column(name = "nombre_completo", nullable = false, length = 150)
     private String nombreCompleto;
@@ -28,6 +28,12 @@ public class Cliente {
     @Column(name = "direccion_fiscal", columnDefinition = "TEXT")
     private String direccionFiscal;
 
-    @Column(name = "id_usuario") 
+    @Column(name = "id_usuario")
     private Integer idUsuario;
+
+    @Column(name = "dni", length = 8)
+    private String dni;
+
+    @Column(name = "celular", length = 9)
+    private String celular;
 }

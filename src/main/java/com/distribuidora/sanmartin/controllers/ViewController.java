@@ -66,21 +66,34 @@ public class ViewController {
     }
 
     @PostMapping("/registro")
-    public String procesarRegistro(@RequestParam String username, @RequestParam String password) {
-        Usuario nuevoUsuario = new Usuario();
-        nuevoUsuario.setUsername(username);
-        nuevoUsuario.setPassword_hash(password);
-        nuevoUsuario.setId_rol(2);
-        Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
+public String procesarRegistro(
+        @RequestParam String nombreCompleto,
+        @RequestParam String username,
+        @RequestParam String password,
+        @RequestParam String dni,
+        @RequestParam String celular) {
 
-        Cliente nuevoCliente = new Cliente();
-        nuevoCliente.setNombreCompleto(username);
-        nuevoCliente.setIdUsuario(usuarioGuardado.getId_usuario());
-        clienteRepository.save(nuevoCliente);
+    // Guardar usuario
+    Usuario nuevoUsuario = new Usuario();
+    nuevoUsuario.setUsername(username);
+    nuevoUsuario.setPassword_hash(password);
+    nuevoUsuario.setId_rol(2);
+    nuevoUsuario.setDni(dni);
+    nuevoUsuario.setCelular(celular);
+    Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
 
-        return "redirect:/login";
-    }
+    // Crear cliente vinculado con nombre completo real
+    Cliente nuevoCliente = new Cliente();
+    nuevoCliente.setNombreCompleto(nombreCompleto);
+    nuevoCliente.setIdUsuario(usuarioGuardado.getId_usuario());
+    nuevoCliente.setDni(dni);
+    nuevoCliente.setCelular(celular);
+    nuevoCliente.setTipoDocumento("DNI");
+    nuevoCliente.setNumeroDocumento(dni);
+    clienteRepository.save(nuevoCliente);
 
+    return "redirect:/login";
+}
     @GetMapping("/tienda")
     public String mostrarCatalogo(
             @RequestParam(required = false) Integer categoria,
@@ -124,9 +137,13 @@ public String misPedidos(Model model, Authentication authentication) {
     // ==========================================
 
     @GetMapping("/admin")
-    public String admin() {
-        return "index";
-    }
+public String admin(Model model) {
+    model.addAttribute("totalProductos", productoService.listarProductos().size());
+    model.addAttribute("totalPedidos", ventaService.listarTodas().size());
+    model.addAttribute("totalClientes", clienteRepository.findAll().size());
+    model.addAttribute("totalEnvios", envioService.listarEnvios().size());
+    return "index";
+}
 
     @GetMapping("/envios")
     public String envios(Model model) {

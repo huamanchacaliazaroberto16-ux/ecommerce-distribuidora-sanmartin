@@ -23,14 +23,15 @@
 
                     <div class="mb-3">
                         <label class="form-label">Categoría</label>
-                        <select th:field="*{idCategoria}" id="selectCategoria" class="form-select" required>
-                            <option value="">-- Selecciona una categoría --</option>
-                            <option th:each="cat : ${listaCategorias}"
-                                    th:value="${cat.idCategoria}"
-                                    th:text="${cat.nombre}">
-                            </option>
-                            <option value="nueva">+ Crear nueva categoría...</option>
-                        </select>
+                        <select name="idCategoria" id="selectCategoria" class="form-select" required>
+    <option value="">-- Selecciona una categoría --</option>
+    <option th:each="cat : ${listaCategorias}"
+            th:value="${cat.idCategoria}"
+            th:text="${cat.nombre}"
+            th:selected="${producto.idCategoria != null and producto.idCategoria == cat.idCategoria}">
+    </option>
+    <option value="nueva">+ Crear nueva categoría...</option>
+</select>
 
                         <!-- Campo oculto para nueva categoría -->
                         <div id="campoNuevaCategoria" style="display:none;" class="mt-2 d-flex gap-2">

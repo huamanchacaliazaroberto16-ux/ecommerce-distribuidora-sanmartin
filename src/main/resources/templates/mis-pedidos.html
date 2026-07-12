@@ -1,73 +1,116 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Pedidos | San Martín</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8f9fa; }
+        .top-bar { background: #222; color: #ccc; font-size: 12px; padding: 6px 0; }
+        .navbar-main { background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 12px 0; }
+        .brand-logo { font-size: 22px; font-weight: 900; color: #d32f2f; text-decoration: none; }
+        .brand-sub { font-size: 11px; color: #888; display: block; font-weight: 400; }
+        .page-header { background: linear-gradient(135deg, #b30000, #d32f2f); color: white; padding: 30px 0; margin-bottom: 30px; }
+        .pedido-card { border: none; border-radius: 12px; box-shadow: 0 3px 12px rgba(0,0,0,0.08); margin-bottom: 15px; overflow: hidden; transition: transform 0.2s; }
+        .pedido-card:hover { transform: translateY(-2px); }
+        .pedido-header { background: #f8f9fa; padding: 14px 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .pedido-id { font-weight: 800; color: #d32f2f; font-size: 16px; }
+        .pedido-body { padding: 16px 20px; }
+        .badge-estado { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .badge-pendiente { background: #fff3cd; color: #856404; }
+        .badge-pagado { background: #d1e7dd; color: #0a3622; }
+        .badge-cancelado { background: #f8d7da; color: #842029; }
+        .badge-tienda { background: #e2e3e5; color: #41464b; }
+        .badge-domicilio { background: #cfe2ff; color: #084298; }
+        .vacio-section { text-align: center; padding: 80px 20px; }
+        .vacio-section .icono { font-size: 80px; margin-bottom: 20px; }
+        @media (max-width: 576px) { .top-bar { display: none; } }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-light bg-white shadow-sm mb-4">
-    <div class="container">
-        <a class="navbar-brand fw-bold text-danger" href="/tienda">← Volver a la Tienda</a>
+<div class="top-bar d-none d-md-block">
+    <div class="container d-flex justify-content-between">
+        <span>📞 342-444-0263 &nbsp;|&nbsp; 📍 Pachacutec, Carretera de Tate, Ica</span>
+        <span>✉️ pedidos@distribuidorasanmartin.com</span>
+    </div>
+</div>
+
+<nav class="navbar-main">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <a href="/tienda" class="brand-logo">
+            <img src="/images/logo_empresa.png" alt="San Martín" style="height: 45px; object-fit: contain;">
+            <span class="brand-sub">Distribuidora Online</span>
+        </a>
         <div class="d-flex gap-2">
-            <a href="/carrito" class="btn btn-outline-danger btn-sm">🛒 Mi Carrito</a>
-            <form th:action="@{/logout}" method="post" class="d-inline">
-                <button type="submit" class="btn btn-danger btn-sm">Cerrar Sesión</button>
-            </form>
+            <a href="/carrito" class="btn btn-outline-danger btn-sm">🛒 Carrito</a>
+            <a href="/tienda" class="btn btn-danger btn-sm">← Tienda</a>
         </div>
     </div>
 </nav>
 
-<div class="container">
-    <h3 class="mb-4">📋 Mis Pedidos</h3>
+<div class="page-header">
+    <div class="container">
+        <h2 class="fw-bold mb-0"> Mis Pedidos</h2>
+        <p class="mb-0 opacity-75 mt-1">Historial de todas tus compras</p>
+    </div>
+</div>
 
-    <div th:if="${#lists.isEmpty(listaPedidos)}" class="text-center py-5">
-        <p class="text-muted fs-5">Aún no tienes pedidos realizados.</p>
-        <a href="/tienda" class="btn btn-danger px-4">Ir a la Tienda</a>
+<div class="container pb-5">
+
+    <!-- Sin pedidos -->
+    <div th:if="${#lists.isEmpty(listaPedidos)}" class="vacio-section">
+        <div class="icono"></div>
+        <h4 class="fw-bold text-muted">Aún no tienes pedidos</h4>
+        <p class="text-muted mb-4">Cuando realices una compra, aparecerá aquí tu historial.</p>
+        <a href="/tienda" class="btn btn-danger px-5 py-2">Ir a la Tienda</a>
     </div>
 
-    <div th:if="${!#lists.isEmpty(listaPedidos)}" class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th>#Pedido</th>
-                        <th>Fecha</th>
-                        <th>Subtotal</th>
-                        <th>IGV</th>
-                        <th>Total</th>
-                        <th>Tipo Entrega</th>
-                        <th>Dirección</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="p : ${listaPedidos}">
-                        <td th:text="${p.idVenta}"></td>
-                        <td th:text="${p.fechaVenta}"></td>
-                        <td th:text="'S/. ' + ${p.subtotal}"></td>
-                        <td th:text="'S/. ' + ${p.igv}"></td>
-                        <td th:text="'S/. ' + ${p.totalPagar}"></td>
-                        <td>
-                            <span th:text="${p.tipoEntrega}"
-                                  th:classappend="${p.tipoEntrega == 'Domicilio'} ? 'badge bg-primary' : 'badge bg-secondary'">
-                            </span>
-                        </td>
-                        <td th:text="${p.direccionEntrega != null ? p.direccionEntrega : '-'}"></td>
-                        <td>
-                            <span class="badge"
-                                th:classappend="${p.estadoPago == 'Pendiente'} ? 'bg-warning text-dark' :
-                                               (${p.estadoPago == 'Pagado'} ? 'bg-success' : 'bg-secondary')"
-                                th:text="${p.estadoPago}">
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- Lista de pedidos -->
+    <div th:if="${!#lists.isEmpty(listaPedidos)}">
+        <p class="text-muted mb-3" th:text="'Total: ' + ${#lists.size(listaPedidos)} + ' pedido(s)'"></p>
+
+        <div th:each="p : ${listaPedidos}" class="pedido-card card">
+            <div class="pedido-header">
+                <div>
+                    <span class="pedido-id">Pedido #<span th:text="${p.idVenta}"></span></span>
+                    <small class="text-muted ms-2" th:text="${p.fechaVenta}"></small>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <span th:classappend="${p.tipoEntrega == 'Domicilio'} ? 'badge-domicilio' : 'badge-tienda'"
+                          th:text="(${p.tipoEntrega == 'Domicilio'} ? '🚚 ' : '🏪 ') + ${p.tipoEntrega}"
+                          class="badge-estado"></span>
+                    <span th:classappend="${p.estadoPago == 'Pendiente'} ? 'badge-pendiente' :
+                                         (${p.estadoPago == 'Pagado'} ? 'badge-pagado' : 'badge-cancelado')"
+                          th:text="${p.estadoPago}"
+                          class="badge-estado"></span>
+                </div>
+            </div>
+            <div class="pedido-body">
+                <div class="row g-3">
+                    <div class="col-sm-4">
+                        <small class="text-muted d-block">SUBTOTAL</small>
+                        <span th:text="'S/. ' + ${p.subtotal}"></span>
+                    </div>
+                    <div class="col-sm-4">
+                        <small class="text-muted d-block">IGV</small>
+                        <span th:text="'S/. ' + ${p.igv}"></span>
+                    </div>
+                    <div class="col-sm-4">
+                        <small class="text-muted d-block">TOTAL</small>
+                        <span class="fw-bold text-danger fs-5" th:text="'S/. ' + ${p.totalPagar}"></span>
+                    </div>
+                    <div class="col-12" th:if="${p.direccionEntrega != null}">
+                        <small class="text-muted d-block">DIRECCIÓN DE ENTREGA</small>
+                        <span th:text="${p.direccionEntrega}"></span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

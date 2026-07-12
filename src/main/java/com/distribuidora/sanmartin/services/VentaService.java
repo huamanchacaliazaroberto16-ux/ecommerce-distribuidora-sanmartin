@@ -28,7 +28,8 @@ public class VentaService {
     private ClienteRepository clienteRepository;
 
     public Venta crearVenta(List<ItemCarrito> carrito, Integer idUsuario,
-                            String tipoEntrega, String direccionEntrega) {
+                            String tipoEntrega, String direccionEntrega,
+                            String metodoPago) {
         Cliente cliente = clienteRepository.findByIdUsuario(idUsuario);
         Integer idCliente = (cliente != null) ? cliente.getIdCliente() : null;
 
@@ -50,6 +51,7 @@ public class VentaService {
         venta.setIdCliente(idCliente);
         venta.setTipoEntrega(tipoEntrega);
         venta.setDireccionEntrega("Domicilio".equals(tipoEntrega) ? direccionEntrega : null);
+        venta.setMetodoPago(metodoPago != null ? metodoPago : "Efectivo");
         Venta ventaGuardada = ventaRepository.save(venta);
 
         for (ItemCarrito item : carrito) {

@@ -41,4 +41,7 @@ public class Venta {
 
     @Column(name = "direccion_entrega", columnDefinition = "TEXT")
     private String direccionEntrega;
+
+    @Column(name = "metodo_pago", length = 20)
+    private String metodoPago = "Efectivo";
 }
