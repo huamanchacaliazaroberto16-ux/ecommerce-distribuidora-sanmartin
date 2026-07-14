@@ -111,13 +111,15 @@
                         <td>
                             <form th:action="@{/envios/estado}" method="post" class="d-flex gap-1">
                                 <input type="hidden" name="id" th:value="${e.idEnvio}">
-                                <select name="estado" class="form-select form-select-sm">
-                                    <option value="En preparación">En preparación</option>
-                                    <option value="En camino">En camino</option>
-                                    <option value="Entregado">Entregado</option>
-                                    <option value="Cancelado">Cancelado</option>
+                                <select name="estado" class="form-select form-select-sm"
+                                        th:disabled="${e.estadoEntrega == 'Entregado' or e.estadoEntrega == 'Cancelado'}">
+                                    <option value="En preparación" th:selected="${e.estadoEntrega == 'En preparación'}">En preparación</option>
+                                    <option value="En camino" th:selected="${e.estadoEntrega == 'En camino'}">En camino</option>
+                                    <option value="Entregado" th:selected="${e.estadoEntrega == 'Entregado'}">Entregado</option>
+                                    <option value="Cancelado" th:if="${e.estadoEntrega != 'Entregado'}">Cancelado</option>
                                 </select>
-                                <button type="submit" class="btn btn-sm btn-danger">OK</button>
+                                <button type="submit" class="btn btn-sm btn-danger"
+                                        th:disabled="${e.estadoEntrega == 'Entregado' or e.estadoEntrega == 'Cancelado'}">OK</button>
                             </form>
                         </td>
                     </tr>
