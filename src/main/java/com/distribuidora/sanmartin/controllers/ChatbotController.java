@@ -71,6 +71,50 @@ public class ChatbotController {
         }
 
         // =====================
+        // NO ENTENDIÓ / RESPUESTA INCORRECTA
+        // =====================
+        if (contiene(p, "no dije eso", "no es eso", "no era eso", "no pregunte eso",
+                "no pregunté eso", "no entendiste", "no me entendiste", "no entendio",
+                "no entendió", "esa no es la respuesta", "no tiene nada que ver",
+                "no es lo que busco", "no es lo que pregunte", "no es lo que pregunté",
+                "eso no tiene sentido", "no es correcto", "estas mal", "estás mal",
+                "te equivocaste", "no es asi", "no es así", "mal entendido")) {
+            return "Disculpa, creo que no entendí bien tu consulta. 😅\n\n" +
+                   "¿Podrías reformular tu pregunta? Por ejemplo:\n" +
+                   "• '¿Qué me recomiendas comprar?'\n" +
+                   "• '¿Tienen laptops disponibles?'\n" +
+                   "• '¿Cuál es el producto más económico?'\n\n" +
+                   "Intentaré ayudarte mejor esta vez 🙏";
+        }
+
+        // =====================
+        // RECOMENDACIONES (va antes que "pedido" porque ambas comparten
+        // la palabra "comprar" y esta es mas especifica)
+        // =====================
+        if (contiene(p, "recomienda", "recomiendan", "recomiendas", "recomendacion", "recomendaciones",
+                "recomiendame", "recomiéndame", "que me sugieren", "que sugieren", "sugerencia", "sugerencias",
+                "que compro", "que llevo", "que compraria", "que compraría", "que deberia comprar",
+                "que debería comprar", "que deberia llevar", "que producto me recomiendas",
+                "que productos me recomiendas", "que me recomiendas", "que me recomiendas comprar",
+                "que es lo mejor", "lo mejor", "mas vendido", "mas vendidos", "popular", "populares",
+                "favorito", "cual me conviene", "cual me recomiendas", "cual recomiendas")) {
+            List<Producto> conStock = todos.stream()
+                .filter(pr -> pr.getStockActual() > pr.getStockMinimo())
+                .collect(Collectors.toList());
+            if (conStock.isEmpty()) return "Por el momento no tenemos productos con stock disponible.";
+            StringBuilder sb = new StringBuilder("⭐ Te recomendamos estos productos:\n\n");
+            int limite = Math.min(3, conStock.size());
+            for (int i = 0; i < limite; i++) {
+                Producto pr = conStock.get(i);
+                sb.append("📦 ").append(pr.getNombreProducto()).append("\n");
+                sb.append("   💰 Precio: S/. ").append(pr.getPrecioUnitario()).append("\n");
+                sb.append("   📊 Stock: ").append(pr.getStockActual()).append(" unidades ✅\n\n");
+            }
+            sb.append("¿Te interesa alguno de estos productos?");
+            return sb.toString();
+        }
+
+        // =====================
         // TODOS LOS PRODUCTOS
         // =====================
         if (contiene(p, "todos los productos", "lista de productos", "catalogo", "catalogo completo",
@@ -215,11 +259,11 @@ public class ChatbotController {
                 "llevan a domicilio", "costo de envio", "precio de envio", "flete")) {
             return "🚚 Opciones de entrega:\n\n" +
                    "🏪 Recojo en tienda (Sin costo)\n" +
-                   "   📍 Pachacutec, Carretera de Tate, Ica\n" +
-                   "   ⏰ Lunes a Sábado: 8am - 6pm\n\n" +
+                   "  📍 Pachacutec, Carretera de Tate, Ica\n" +
+                   "  ⏰ Lunes a Sábado: 8am - 6pm\n\n" +
                    "🚚 Envío a domicilio\n" +
-                   "   📍 Cobertura en la región de Ica\n" +
-                   "   ⏰ Entrega en 24-48 horas\n\n" +
+                   "  📍 Cobertura en la región de Ica\n" +
+                   "  ⏰ Entrega en 24-48 horas\n\n" +
                    "📞 Para más información: 342-444-0263";
         }
 
@@ -348,6 +392,45 @@ public class ChatbotController {
         }
 
         // =====================
+        // PRECIO DE PRODUCTO ESPECÍFICO
+        // =====================
+        if (contiene(p, "cuanto cuesta", "cual es el precio", "precio de", "cuanto vale",
+                "a cuanto esta", "cuanto es", "precio del", "cuanto sale")) {
+            List<String> clavesPrecio = extraerPalabrasClave(p);
+            List<Producto> encontradosPrecio = new ArrayList<>();
+            for (Producto prod : todos) {
+                String nombre = normalizar(prod.getNombreProducto());
+                for (String clave : clavesPrecio) {
+                    if (clave.length() > 2 && nombre.contains(clave)) {
+                        if (!encontradosPrecio.contains(prod)) encontradosPrecio.add(prod);
+                        break;
+                    }
+                }
+            }
+            if (!encontradosPrecio.isEmpty()) {
+                StringBuilder sb = new StringBuilder("💰 Información de precios:\n\n");
+                for (Producto prod : encontradosPrecio) {
+                    sb.append("📦 ").append(prod.getNombreProducto()).append("\n");
+                    sb.append("   💵 Precio: S/. ").append(prod.getPrecioUnitario()).append("\n");
+                    sb.append("   📊 Stock: ").append(prod.getStockActual()).append(" unidades\n\n");
+                }
+                return sb.toString();
+            }
+        }
+
+        // =====================
+        // COMPARAR PRECIOS
+        // =====================
+        if (contiene(p, "mas barato de", "menos caro de", "mejor precio de",
+                "cuanto cuesta el mas barato", "precio minimo de")) {
+            return todos.stream()
+                .min(Comparator.comparing(Producto::getPrecioUnitario))
+                .map(pr -> "💰 El más económico:\n\n📦 " + pr.getNombreProducto() +
+                           "\n💵 S/. " + pr.getPrecioUnitario())
+                .orElse("No hay productos.");
+        }
+
+        // =====================
         // BÚSQUEDA EN BD — debe ir siempre al final
         // =====================
         List<String> claves = extraerPalabrasClave(p);
@@ -385,15 +468,15 @@ public class ChatbotController {
         // RESPUESTA POR DEFECTO
         // =====================
         return "🤔 No encontré información sobre eso.\n\n" +
-               "Puedes preguntarme sobre:\n" +
-               "• 📦 Productos: '¿tienen laptops?', '¿precio del iPhone?'\n" +
-               "• 📊 Stock: '¿qué productos están disponibles?'\n" +
-               "• 🏷️ Categorías: '¿qué categorías tienen?'\n" +
-               "• 🛒 Pedidos: '¿cómo hago un pedido?'\n" +
-               "• 💳 Pagos: '¿qué métodos de pago aceptan?'\n" +
-               "• 🚚 Envíos: '¿hacen delivery?'\n" +
-               "• 📞 Contacto: '¿cuál es su número?'\n\n" +
-               "O llámanos directamente: 📞 342-444-0263";
+                "Puedes preguntarme sobre:\n" +
+                "• 📦 Productos: '¿tienen laptops?', '¿precio del iPhone?'\n" +
+                "• 📊 Stock: '¿qué productos están disponibles?'\n" +
+                "• 🏷️ Categorías: '¿qué categorías tienen?'\n" +
+                "• 🛒 Pedidos: '¿cómo hago un pedido?'\n" +
+                "• 💳 Pagos: '¿qué métodos de pago aceptan?'\n" +
+                "• 🚚 Envíos: '¿hacen delivery?'\n" +
+                "• 📞 Contacto: '¿cuál es su número?'\n\n" +
+                "O llámanos directamente: 📞 342-444-0263";
     }
 
     private boolean contiene(String texto, String... palabras) {
@@ -404,6 +487,8 @@ public class ChatbotController {
     }
 
     private List<String> extraerPalabrasClave(String pregunta) {
+        Map<String, String> sinonimos = construirSinonimos();
+
         String[] stopWords = {
             "tienen", "hay", "tiene", "cuanto", "cuesta", "vale", "precio",
             "stock", "disponible", "queda", "quedan", "el", "la", "los", "las",
@@ -420,13 +505,113 @@ public class ChatbotController {
         List<String> resultado = new ArrayList<>();
         for (String palabra : pregunta.split("\\s+")) {
             palabra = palabra.trim();
+            if (palabra.isEmpty()) continue;
+
+            if (sinonimos.containsKey(palabra)) {
+                String base = sinonimos.get(palabra);
+                if (!base.isEmpty() && !resultado.contains(base)) {
+                    resultado.add(base);
+                }
+                continue;
+            }
+
             if (palabra.length() <= 2) continue;
             boolean esStop = false;
             for (String stop : stopWords) {
                 if (palabra.equals(stop)) { esStop = true; break; }
             }
-            if (!esStop) resultado.add(palabra);
+            if (!esStop && !resultado.contains(palabra)) resultado.add(palabra);
         }
         return resultado;
+    }
+
+    private Map<String, String> construirSinonimos() {
+        Map<String, String> sinonimos = new HashMap<>();
+        sinonimos.put("iphones", "iphone");
+        sinonimos.put("iphone", "iphone");
+        sinonimos.put("apple", "iphone");
+        sinonimos.put("celular", "");
+        sinonimos.put("celulares", "");
+        sinonimos.put("smartphones", "");
+        sinonimos.put("smartphone", "");
+        sinonimos.put("telefono", "");
+        sinonimos.put("telefonos", "");
+        sinonimos.put("laptop", "laptop");
+        sinonimos.put("laptops", "laptop");
+        sinonimos.put("computadora", "laptop");
+        sinonimos.put("computadoras", "laptop");
+        sinonimos.put("computador", "laptop");
+        sinonimos.put("computadores", "laptop");
+        sinonimos.put("pc", "laptop");
+        sinonimos.put("notebook", "laptop");
+        sinonimos.put("notebooks", "laptop");
+        sinonimos.put("asus", "asus");
+        sinonimos.put("samsung", "samsung");
+        sinonimos.put("tv", "tv");
+        sinonimos.put("tvs", "tv");
+        sinonimos.put("television", "tv");
+        sinonimos.put("televisor", "tv");
+        sinonimos.put("televisores", "tv");
+        sinonimos.put("televisiones", "tv");
+        sinonimos.put("smart tv", "smart");
+        sinonimos.put("smarttv", "smart");
+        sinonimos.put("refrigerador", "refrigerador");
+        sinonimos.put("refrigeradora", "refrigerador");
+        sinonimos.put("refrigeradoras", "refrigerador");
+        sinonimos.put("refrigeradores", "refrigerador");
+        sinonimos.put("fridge", "refrigerador");
+        sinonimos.put("nevera", "refrigerador");
+        sinonimos.put("neveras", "refrigerador");
+        sinonimos.put("heladera", "refrigerador");
+        sinonimos.put("auricular", "auricular");
+        sinonimos.put("auriculares", "auricular");
+        sinonimos.put("audifonos", "audifono");
+        sinonimos.put("audifono", "audifono");
+        sinonimos.put("headphones", "audifono");
+        sinonimos.put("airpods", "airpods");
+        sinonimos.put("airpod", "airpods");
+        sinonimos.put("lavadora", "lavadora");
+        sinonimos.put("lavadoras", "lavadora");
+        sinonimos.put("microondas", "microondas");
+        sinonimos.put("horno", "horno");
+        sinonimos.put("hornos", "horno");
+        sinonimos.put("licuadora", "licuadora");
+        sinonimos.put("licuadoras", "licuadora");
+        sinonimos.put("aspiradora", "aspiradora");
+        sinonimos.put("aspiradoras", "aspiradora");
+        sinonimos.put("ventilador", "ventilador");
+        sinonimos.put("ventiladores", "ventilador");
+        sinonimos.put("parlante", "parlante");
+        sinonimos.put("parlantes", "parlante");
+        sinonimos.put("bocina", "parlante");
+        sinonimos.put("bocinas", "parlante");
+        sinonimos.put("speaker", "parlante");
+        sinonimos.put("tablet", "tablet");
+        sinonimos.put("tablets", "tablet");
+        sinonimos.put("ipad", "tablet");
+        sinonimos.put("reloj", "reloj");
+        sinonimos.put("relojes", "reloj");
+        sinonimos.put("smartwatch", "reloj");
+        sinonimos.put("camara", "camara");
+        sinonimos.put("camaras", "camara");
+        sinonimos.put("impresora", "impresora");
+        sinonimos.put("impresoras", "impresora");
+        sinonimos.put("monitor", "monitor");
+        sinonimos.put("monitores", "monitor");
+        sinonimos.put("teclado", "teclado");
+        sinonimos.put("teclados", "teclado");
+        sinonimos.put("mouse", "mouse");
+        sinonimos.put("mouses", "mouse");
+        sinonimos.put("router", "router");
+        sinonimos.put("routers", "router");
+        sinonimos.put("disco", "disco");
+        sinonimos.put("discos", "disco");
+        sinonimos.put("memoria", "memoria");
+        sinonimos.put("memorias", "memoria");
+        sinonimos.put("cable", "cable");
+        sinonimos.put("cables", "cable");
+        sinonimos.put("cargador", "cargador");
+        sinonimos.put("cargadores", "cargador");
+        return sinonimos;
     }
 }
